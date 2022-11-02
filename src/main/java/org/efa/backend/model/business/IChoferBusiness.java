@@ -6,4 +6,6 @@ import org.efa.backend.model.Chofer;
 
 public interface IChoferBusiness {
     public Chofer load(long dni) throws BusinessException, NotFoundException;
+
+    public Chofer loadById(Long id) throws BusinessException, NotFoundException;
 }

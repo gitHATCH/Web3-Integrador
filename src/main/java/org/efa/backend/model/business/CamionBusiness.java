@@ -3,8 +3,8 @@ package org.efa.backend.model.business;
 import lombok.extern.slf4j.Slf4j;
 import org.efa.backend.exceptions.custom.BusinessException;
 import org.efa.backend.exceptions.custom.NotFoundException;
-import org.efa.backend.model.Chofer;
-import org.efa.backend.model.persistence.ChoferRepository;
+import org.efa.backend.model.Camion;
+import org.efa.backend.model.persistence.CamionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,37 +12,37 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class ChoferBusiness implements IChoferBusiness{
+public class CamionBusiness implements ICamionBusiness {
 
     @Autowired
-    private ChoferRepository choferDAO;
+    private CamionRepository camionDAO;
 
     @Override
-    public Chofer load(long dni) throws BusinessException, NotFoundException {
-        Optional<Chofer> response;
+    public Camion load(String patente) throws BusinessException, NotFoundException {
+        Optional<Camion> response;
         try{
-            response = choferDAO.findByDni(dni);
+            response = camionDAO.findByPatente(patente);
         }catch (Exception e){
             log.error(e.getMessage(), e);
             throw BusinessException.builder().ex(e).build();
         }
         if (response.isEmpty()) {
-            throw NotFoundException.builder().message("No se encuentra el chofer con dni '" + dni + "'").build();
+            throw NotFoundException.builder().message("No se encuentra el camion con patente '" + patente + "'").build();
         }
         return response.get();
     }
 
     @Override
-    public Chofer loadById(Long id) throws BusinessException, NotFoundException {
-        Optional<Chofer> response;
+    public Camion loadById(Long id) throws BusinessException, NotFoundException {
+        Optional<Camion> response;
         try{
-            response = choferDAO.findById(id);
+            response = camionDAO.findById(id);
         }catch (Exception e){
             log.error(e.getMessage(), e);
             throw BusinessException.builder().ex(e).build();
         }
         if (response.isEmpty()) {
-            throw NotFoundException.builder().message("No se encuentra el chofer con id '" + id + "'").build();
+            throw NotFoundException.builder().message("No se encuentra el camion con id '" + id + "'").build();
         }
         return response.get();
     }
