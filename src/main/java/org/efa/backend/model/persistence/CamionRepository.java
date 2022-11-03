@@ -10,4 +10,6 @@ public interface CamionRepository extends JpaRepository<Camion, String> {
     Optional<Camion> findByPatente(String patente);
 
     Optional<Camion> findById(Long id);
+
+    void deleteById(Long id);
 }

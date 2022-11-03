@@ -4,20 +4,18 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class NotFoundException extends Exception {
+public class FoundException extends Exception {
 
     @Builder
-    public NotFoundException(String message, Throwable ex) {
+    public FoundException(String message, Throwable ex) {
         super(message, ex);
     }
-
     @Builder
-    public NotFoundException(String message) {
+    public FoundException(String message) {
         super(message);
     }
-
     @Builder
-    public NotFoundException(Throwable ex) {
+    public FoundException(Throwable ex) {
         super(ex.getMessage(), ex);
     }
 

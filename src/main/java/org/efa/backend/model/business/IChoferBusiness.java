@@ -1,11 +1,24 @@
 package org.efa.backend.model.business;
 
 import org.efa.backend.exceptions.custom.BusinessException;
+import org.efa.backend.exceptions.custom.FoundException;
 import org.efa.backend.exceptions.custom.NotFoundException;
 import org.efa.backend.model.Chofer;
 
-public interface IChoferBusiness {
-    public Chofer load(long dni) throws BusinessException, NotFoundException;
+import java.util.List;
 
-    public Chofer loadById(Long id) throws BusinessException, NotFoundException;
+public interface IChoferBusiness {
+    Chofer load(long dni) throws BusinessException, NotFoundException;
+
+    Chofer loadById(Long id) throws BusinessException, NotFoundException;
+
+    List<Chofer> loadAll() throws BusinessException;
+
+    Chofer add(Chofer chofer) throws FoundException, BusinessException;
+
+    Chofer update(Chofer chofer) throws NotFoundException, BusinessException;
+
+    void delete(long dni) throws NotFoundException, BusinessException;
+
+    void deleteById(long id) throws NotFoundException, BusinessException;
 }

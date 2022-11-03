@@ -2,12 +2,14 @@ package org.efa.backend.model.business;
 
 import lombok.extern.slf4j.Slf4j;
 import org.efa.backend.exceptions.custom.BusinessException;
+import org.efa.backend.exceptions.custom.FoundException;
 import org.efa.backend.exceptions.custom.NotFoundException;
 import org.efa.backend.model.Producto;
 import org.efa.backend.model.persistence.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -46,4 +48,64 @@ public class ProductoBusiness implements IProductoBusiness {
         }
         return response.get();
     }
+
+    @Override
+    public List<Producto> loadAll() throws BusinessException {
+        try {
+            return productoDAO.findAll();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw BusinessException.builder().ex(e).build();
+        }
+    }
+
+    @Override
+    public Producto add(Producto producto) throws FoundException, BusinessException {
+        try {
+            load(producto.getNombre());
+            throw FoundException.builder().message("Ya existe un producto con nombre '" + producto.getNombre() +"'").build();
+        } catch (NotFoundException ex) {
+            //No existe -> procede a crear
+            try {
+                return productoDAO.save(producto);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                throw BusinessException.builder().ex(e).build();
+            }
+        }
+    }
+
+    @Override
+    public Producto update(Producto producto) throws NotFoundException, BusinessException {
+        loadById(producto.getId());
+        try {
+            return productoDAO.save(producto);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw BusinessException.builder().ex(e).build();
+        }
+    }
+
+    @Override
+    public void deleteById(long id) throws NotFoundException, BusinessException {
+        loadById(id);
+        try {
+            productoDAO.deleteById(id);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw BusinessException.builder().ex(e).build();
+        }
+    }
+
+    @Override
+    public void delete(String nombre) throws NotFoundException, BusinessException {
+        Producto producto = load(nombre);
+        try {
+            productoDAO.deleteById(producto.getId());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw BusinessException.builder().ex(e).build();
+        }
+    }
+
 }

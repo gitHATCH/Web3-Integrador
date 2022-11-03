@@ -2,12 +2,14 @@ package org.efa.backend.model.business;
 
 import lombok.extern.slf4j.Slf4j;
 import org.efa.backend.exceptions.custom.BusinessException;
+import org.efa.backend.exceptions.custom.FoundException;
 import org.efa.backend.exceptions.custom.NotFoundException;
 import org.efa.backend.model.Orden;
 import org.efa.backend.model.persistence.OrdenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -46,4 +48,65 @@ public class OrdenBusiness implements IOrdenBusiness{
         }
         return response.get();
     }
+
+    @Override
+    public List<Orden> loadAll() throws BusinessException {
+        try {
+            return ordenDAO.findAll();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw BusinessException.builder().ex(e).build();
+        }
+    }
+
+    @Override
+    public Orden add(Orden orden) throws FoundException, BusinessException {
+        //TODO: Agregar el detalle orden y el detalle carga
+        try {
+            load(orden.getNumero());
+            throw FoundException.builder().message("Ya existe la orden numero '" + orden.getNumero() +"'").build();
+        } catch (NotFoundException ex) {
+            //No existe -> procede a crear
+            try {
+                return ordenDAO.save(orden);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                throw BusinessException.builder().ex(e).build();
+            }
+        }
+    }
+
+    @Override
+    public Orden update(Orden orden) throws NotFoundException, BusinessException {
+        loadById(orden.getId());
+        try {
+            return ordenDAO.save(orden);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw BusinessException.builder().ex(e).build();
+        }
+    }
+
+    @Override
+    public void deleteById(long id) throws NotFoundException, BusinessException {
+        loadById(id);
+        try {
+            ordenDAO.deleteById(id);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw BusinessException.builder().ex(e).build();
+        }
+    }
+
+    @Override
+    public void delete(long numero) throws NotFoundException, BusinessException {
+        Orden orden = load(numero);
+        try {
+            ordenDAO.deleteById(orden.getId());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw BusinessException.builder().ex(e).build();
+        }
+    }
+
 }

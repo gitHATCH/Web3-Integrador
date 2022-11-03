@@ -11,4 +11,7 @@ public interface ChoferRepository extends JpaRepository<Chofer, Long>{
     Optional<Chofer> findByDni(long dni);
 
     Optional<Chofer> findById(Long id);
+
+    void deleteById(Long id);
+
 }

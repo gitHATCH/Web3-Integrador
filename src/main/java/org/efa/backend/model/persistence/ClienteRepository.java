@@ -11,4 +11,6 @@ public interface ClienteRepository  extends JpaRepository<Cliente, String> {
     Optional<Cliente> findByRazonSocial(String razonSocial);
 
     Optional<Cliente> findById(Long id);
+
+    void deleteById(Long id);
 }
