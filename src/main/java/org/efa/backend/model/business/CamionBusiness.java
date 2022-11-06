@@ -62,6 +62,7 @@ public class CamionBusiness implements ICamionBusiness {
 
     @Override
     public Camion add(Camion camion) throws FoundException, BusinessException {
+        //TODO: Agregar control de patente (7 caracteres)
         try {
             load(camion.getPatente());
             throw FoundException.builder().message("Ya existe un camion con patente '" + camion.getPatente() +"'").build();
@@ -78,6 +79,7 @@ public class CamionBusiness implements ICamionBusiness {
 
     @Override
     public Camion update(Camion camion) throws NotFoundException, BusinessException {
+        //TODO: Arreglar update
         loadById(camion.getId());
         try {
             return camionDAO.save(camion);
@@ -87,6 +89,7 @@ public class CamionBusiness implements ICamionBusiness {
         }
     }
 
+    //TODO: Arreglar Deletes
     @Override
     public void deleteById(long id) throws NotFoundException, BusinessException {
         loadById(id);
