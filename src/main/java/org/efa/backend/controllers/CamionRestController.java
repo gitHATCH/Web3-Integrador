@@ -3,6 +3,7 @@ package org.efa.backend.controllers;
 import org.efa.backend.exceptions.custom.BusinessException;
 import org.efa.backend.exceptions.custom.FoundException;
 import org.efa.backend.exceptions.custom.NotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 import org.efa.backend.miscellaneous.Paths;
 import org.efa.backend.model.Camion;
 import org.efa.backend.model.business.ICamionBusiness;
@@ -85,7 +86,7 @@ public class CamionRestController {
             return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
         }
     }
-
+    @Transactional
     @DeleteMapping(value="/eliminar/{patente}")
     public ResponseEntity<?> delete(@PathVariable("patente") String patente){
         try {
@@ -96,7 +97,7 @@ public class CamionRestController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    @Transactional
     @DeleteMapping(value="/eliminar/id/{id}")
     public ResponseEntity<?> deleteById(@PathVariable("id") Long id){
         try {
