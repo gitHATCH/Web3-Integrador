@@ -19,6 +19,9 @@ public class OrdenBusiness implements IOrdenBusiness{
     @Autowired
     private OrdenRepository ordenDAO;
 
+    @Autowired
+    private CamionBusiness camion;
+
     @Override
     public Orden load(long numero) throws BusinessException, NotFoundException {
         Optional<Orden> response;
@@ -61,13 +64,14 @@ public class OrdenBusiness implements IOrdenBusiness{
 
     @Override
     public Orden add(Orden orden) throws FoundException, BusinessException {
-        //TODO: Agregar el detalle orden y el detalle carga
         try {
             load(orden.getNumero());
             throw FoundException.builder().message("Ya existe la orden numero '" + orden.getNumero() +"'").build();
         } catch (NotFoundException ex) {
             //No existe -> procede a crear
             try {
+                orden.setEstado(1);
+                orden.getDetalleOrden().setPesajeInicial(0);
                 return ordenDAO.save(orden);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
