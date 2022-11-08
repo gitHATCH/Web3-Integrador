@@ -16,18 +16,18 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class DetalleCarga {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer masa;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer densidad;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer temperatura;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer caudal;
 }

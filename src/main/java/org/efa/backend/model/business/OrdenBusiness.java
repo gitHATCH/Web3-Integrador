@@ -69,9 +69,10 @@ public class OrdenBusiness implements IOrdenBusiness{
             throw FoundException.builder().message("Ya existe la orden numero '" + orden.getNumero() +"'").build();
         } catch (NotFoundException ex) {
             //No existe -> procede a crear
+            //Caused by: java.sql.SQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`iw3final_db`.`ordenes`, CONSTRAINT `FKs4be0s7apibundgy9mked55xc` FOREIGN KEY (`id_camion`) REFERENCES `camiones` (`id`))
+            //TODO: Detectar cuando una foranea no existe y dar mensaje personalizado
             try {
                 orden.setEstado(1);
-                orden.getDetalleOrden().setPesajeInicial(0);
                 return ordenDAO.save(orden);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);

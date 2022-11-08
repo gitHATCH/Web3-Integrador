@@ -16,7 +16,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class Producto {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(length = 75, unique = true, nullable = false)

@@ -31,20 +31,20 @@ public class Orden {
     @Column(length = 5, unique = true, nullable = true)
     private Integer password;
 
-    @ManyToOne(cascade= CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name="id_camion", nullable = false)
     private Camion camion;
 
-    @ManyToOne(cascade= CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name="id_chofer", nullable = false)
     private Chofer chofer;
 
-    @ManyToOne(cascade= CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name="id_cliente", nullable = false)
     private Cliente cliente;
 
-    @OneToOne(cascade= CascadeType.ALL)
-    @JoinColumn(name = "id_detalleOrden", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "id_detalleOrden", nullable = true)
     private DetalleOrden detalleOrden;
 
 }

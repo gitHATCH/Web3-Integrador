@@ -17,7 +17,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class DetalleOrden {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = true)
@@ -35,11 +35,11 @@ public class DetalleOrden {
     @Column(nullable = true)
     private Date fechaRecepcionFinal;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer pesajeInicial;
 
     @ManyToOne(cascade= CascadeType.ALL)
-    @JoinColumn(name="id_producto", nullable = false)
+    @JoinColumn(name="id_producto", nullable = true)
     private Producto producto;
 
     @OneToOne(cascade= CascadeType.ALL)
