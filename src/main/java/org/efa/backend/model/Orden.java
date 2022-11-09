@@ -43,7 +43,7 @@ public class Orden {
     @JoinColumn(name="id_cliente", nullable = false)
     private Cliente cliente;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "id_detalleOrden", nullable = true)
     private DetalleOrden detalleOrden;
 

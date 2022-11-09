@@ -23,7 +23,7 @@ public class DetalleOrden {
     @Column(nullable = true)
     private Date fechaRecepcionCarga;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private Date fechaRecepcionPesajeInicial;
 
     @Column(nullable = true)
@@ -35,11 +35,11 @@ public class DetalleOrden {
     @Column(nullable = true)
     private Date fechaRecepcionFinal;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private Integer pesajeInicial;
 
-    @ManyToOne(cascade= CascadeType.ALL)
-    @JoinColumn(name="id_producto", nullable = true)
+    @ManyToOne
+    @JoinColumn(name="id_producto", nullable = false)
     private Producto producto;
 
     @OneToOne(cascade= CascadeType.ALL)

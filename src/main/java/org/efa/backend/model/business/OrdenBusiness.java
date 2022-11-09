@@ -1,9 +1,11 @@
 package org.efa.backend.model.business;
 
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Or;
 import org.efa.backend.exceptions.custom.BusinessException;
 import org.efa.backend.exceptions.custom.FoundException;
 import org.efa.backend.exceptions.custom.NotFoundException;
+import org.efa.backend.model.DetalleOrden;
 import org.efa.backend.model.Orden;
 import org.efa.backend.model.persistence.OrdenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +77,7 @@ public class OrdenBusiness implements IOrdenBusiness{
 
         try {
             load(orden.getNumero());
-            throw FoundException.builder().message("Ya existe la orden numero '" + orden.getNumero() +"'"+orden.getCamion().getId()).build();
+            throw FoundException.builder().message("Ya existe la orden numero '" + orden.getNumero()).build();
         } catch (NotFoundException ex) {
             //No existe -> procede a crear
             //Caused by: java.sql.SQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`iw3final_db`.`ordenes`, CONSTRAINT `FKs4be0s7apibundgy9mked55xc` FOREIGN KEY (`id_camion`) REFERENCES `camiones` (`id`))
@@ -140,6 +142,7 @@ public class OrdenBusiness implements IOrdenBusiness{
                 }
 
                 orden.setEstado(1);
+                orden.setDetalleOrden(null);
                 return ordenDAO.save(orden);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
@@ -185,4 +188,60 @@ public class OrdenBusiness implements IOrdenBusiness{
         }
     }
 
+    @Override
+    public Orden addTara(Orden orden) throws NotFoundException, BusinessException {
+        Orden ordenNueva;
+        if(orden.getDetalleOrden() != null) {
+            if (orden.getId() != null) {
+                try {
+                    ordenNueva = loadById(orden.getId());
+                    if(ordenNueva.getEstado() == 1) {
+                        ordenNueva.setDetalleOrden(orden.getDetalleOrden());
+                        ordenNueva.setEstado(2);
+                        //Agregar pass
+                        return ordenDAO.save(ordenNueva);
+                    }else{
+                        throw BusinessException.builder().message("La orden especificada ya pertenece a un estado superior por lo que tiene asignada una tara").build();
+                    }
+                } catch (NotFoundException e) {
+                    log.error(e.getMessage(), e);
+                    throw NotFoundException.builder().message("No se encuentra la orden con id " + orden.getId()).build();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw BusinessException.builder().ex(e).build();
+                }
+            } else {
+                if (orden.getNumero() != null) {
+                    try {
+                        ordenNueva = load(orden.getNumero());
+                        if(ordenNueva.getEstado() == 1) {
+                            ordenNueva.setDetalleOrden(orden.getDetalleOrden());
+                            ordenNueva.setEstado(2);
+                            //Agregar pass
+                            return ordenDAO.save(ordenNueva);
+                        }else{
+                            throw BusinessException.builder().message("La orden especificada ya pertenece a un estado superior por lo que tiene asignada una tara").build();
+                        }
+                    } catch (NotFoundException e) {
+                        log.error(e.getMessage(), e);
+                        throw NotFoundException.builder().message("No se encuentra la orden con numero " + orden.getNumero()).build();
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                        throw BusinessException.builder().ex(e).build();
+                    }
+                } else {
+                    try {
+                        return ordenDAO.save(orden);
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                        throw BusinessException.builder().ex(e).build();
+                    }
+                }
+            }
+        }else{
+            throw BusinessException.builder().message("Es necesario ingresar el detalle de la orden con los datos del pesaje inicial y el producto").build();
+        }
+    }
+        /*
+    }*/
 }
