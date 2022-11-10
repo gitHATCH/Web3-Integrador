@@ -27,6 +27,9 @@ public class OrdenBusiness implements IOrdenBusiness{
     private ChoferBusiness chofer;
 
     @Autowired
+    private ProductoBusiness producto;
+
+    @Autowired
     private ClienteBusiness cliente;
     private final int MINIMO = 99999;
     private final int MAXIMO = 10000;
@@ -143,6 +146,27 @@ public class OrdenBusiness implements IOrdenBusiness{
                     }
                 }
 
+                //Control Producto
+                if(orden.getProducto().getId() != null){
+                    try {
+                        producto.loadById(orden.getProducto().getId());
+                    } catch(NotFoundException e){
+                        foreignData = new String[]{"producto","id",orden.getProducto().getId().toString()};
+                        noForeignFlag = true;
+                    }
+                }else{
+                    if(orden.getProducto().getNombre() != null) {
+                        try {
+                            orden.setProducto(producto.load(orden.getProducto().getNombre()));
+                        } catch (NotFoundException e) {
+                            foreignData = new String[]{"producto", "nombre", orden.getProducto().getNombre()};
+                            noForeignFlag = true;
+                        }
+                    }
+                }
+
+
+
                 orden.setEstado(1);
                 orden.setDetalleOrden(null);
                 return ordenDAO.save(orden);
@@ -191,7 +215,7 @@ public class OrdenBusiness implements IOrdenBusiness{
     }
 
     @Override
-    public Orden addTara(Orden orden) throws NotFoundException, BusinessException {
+    public Integer addTara(Orden orden) throws NotFoundException, BusinessException {
         Orden ordenNueva;
         if(orden.getDetalleOrden() != null) {
             if (orden.getId() != null) {
@@ -219,7 +243,7 @@ public class OrdenBusiness implements IOrdenBusiness{
                     }
                 } else {
                     try {
-                        return ordenDAO.save(orden);
+                        return ordenDAO.save(orden).getPassword();
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
                         throw BusinessException.builder().ex(e).build();
@@ -227,22 +251,45 @@ public class OrdenBusiness implements IOrdenBusiness{
                 }
             }
         }else{
-            throw BusinessException.builder().message("Es necesario ingresar el detalle de la orden con los datos del pesaje inicial y el producto").build();
+            throw BusinessException.builder().message("Es necesario ingresar el detalle de la orden con los datos del pesaje inicial").build();
         }
     }
 
-    private Orden updateOrden(Orden ordenVieja, Orden ordenNueva) throws BusinessException {
+    private Integer updateOrden(Orden ordenVieja, Orden ordenNueva) throws BusinessException {
         Random rand = new Random();
         if(ordenNueva.getEstado() == 1) {
             ordenNueva.setDetalleOrden(ordenVieja.getDetalleOrden());
             ordenNueva.setEstado(2);
             ordenNueva.getDetalleOrden().setFechaRecepcionPesajeInicial(new Date());
             ordenNueva.setPassword((int) Math.floor(Math.random()*(MAXIMO-MINIMO+1)+MINIMO));
-            return ordenDAO.save(ordenNueva);
+            return ordenDAO.save(ordenNueva).getPassword();
         }else{
             throw BusinessException.builder().message("La orden especificada ya pertenece a un estado superior por lo que tiene asignada una tara").build();
         }
     }
+
+    /*
+    private String[] addOrdenCamionController(Orden orden) {
+                if(orden.getCamion().getId() != null){
+                    try {
+                        camion.loadById(orden.getCamion().getId());
+                    } catch(NotFoundException e){
+                        foreignData = new String[]{"camion","id",orden.getCamion().getId().toString()}; //
+                        noForeignFlag = true; //
+                    }
+                }else{
+                    if(orden.getCamion().getPatente() != null) {
+                        try {
+                            orden.setCamion(camion.load(orden.getCamion().getPatente()));
+                        } catch (NotFoundException e) {
+                            foreignData = new String[]{"camion", "patente", orden.getCamion().getPatente()};
+                            noForeignFlag = true;
+                        }
+                    }
+                }
+    }
+
+    */
 
 
 }

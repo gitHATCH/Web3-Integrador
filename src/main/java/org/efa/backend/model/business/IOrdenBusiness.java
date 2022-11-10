@@ -23,5 +23,5 @@ public interface IOrdenBusiness {
 
     void deleteById(long id) throws NotFoundException, BusinessException;
 
-    Orden addTara(Orden orden) throws NotFoundException, BusinessException;
+    Integer addTara(Orden orden) throws NotFoundException, BusinessException;
 }

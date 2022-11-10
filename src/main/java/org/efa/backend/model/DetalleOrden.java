@@ -38,10 +38,6 @@ public class DetalleOrden {
     @Column(nullable = false)
     private Integer pesajeInicial;
 
-    @ManyToOne
-    @JoinColumn(name="id_producto", nullable = false)
-    private Producto producto;
-
     @OneToOne(cascade= CascadeType.ALL)
     @JoinColumn(name = "id_detalleCarga", nullable = true)
     private DetalleCarga detalleCarga;

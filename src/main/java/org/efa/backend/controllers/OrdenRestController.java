@@ -114,8 +114,8 @@ public class OrdenRestController {
     @PutMapping(value = "/tara")
     public ResponseEntity<?> setTara(@RequestBody Orden orden) {
         try {
-            ordenBusiness.addTara(orden);
-            return new ResponseEntity<>(HttpStatus.OK);
+            Integer password = ordenBusiness.addTara(orden);
+            return new ResponseEntity<>("Password: " + password, HttpStatus.OK);
         } catch (BusinessException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
