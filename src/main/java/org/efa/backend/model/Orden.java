@@ -28,7 +28,7 @@ public class Orden {
     @Column(nullable = false)
     private Integer preset;
 
-    @Column(length = 5, unique = true, nullable = true)
+    @Column(length = 5, nullable = true)
     private Integer password;
 
     @ManyToOne

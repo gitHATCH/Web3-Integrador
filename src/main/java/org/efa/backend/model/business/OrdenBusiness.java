@@ -28,6 +28,8 @@ public class OrdenBusiness implements IOrdenBusiness{
 
     @Autowired
     private ClienteBusiness cliente;
+    private final int MINIMO = 99999;
+    private final int MAXIMO = 10000;
 
     @Override
     public Orden load(long numero) throws BusinessException, NotFoundException {
@@ -195,14 +197,7 @@ public class OrdenBusiness implements IOrdenBusiness{
             if (orden.getId() != null) {
                 try {
                     ordenNueva = loadById(orden.getId());
-                    if(ordenNueva.getEstado() == 1) {
-                        ordenNueva.setDetalleOrden(orden.getDetalleOrden());
-                        ordenNueva.setEstado(2);
-                        //Agregar pass
-                        return ordenDAO.save(ordenNueva);
-                    }else{
-                        throw BusinessException.builder().message("La orden especificada ya pertenece a un estado superior por lo que tiene asignada una tara").build();
-                    }
+                    return updateOrden(orden, ordenNueva);
                 } catch (NotFoundException e) {
                     log.error(e.getMessage(), e);
                     throw NotFoundException.builder().message("No se encuentra la orden con id " + orden.getId()).build();
@@ -214,14 +209,7 @@ public class OrdenBusiness implements IOrdenBusiness{
                 if (orden.getNumero() != null) {
                     try {
                         ordenNueva = load(orden.getNumero());
-                        if(ordenNueva.getEstado() == 1) {
-                            ordenNueva.setDetalleOrden(orden.getDetalleOrden());
-                            ordenNueva.setEstado(2);
-                            //Agregar pass
-                            return ordenDAO.save(ordenNueva);
-                        }else{
-                            throw BusinessException.builder().message("La orden especificada ya pertenece a un estado superior por lo que tiene asignada una tara").build();
-                        }
+                        return updateOrden(orden, ordenNueva);
                     } catch (NotFoundException e) {
                         log.error(e.getMessage(), e);
                         throw NotFoundException.builder().message("No se encuentra la orden con numero " + orden.getNumero()).build();
@@ -242,6 +230,19 @@ public class OrdenBusiness implements IOrdenBusiness{
             throw BusinessException.builder().message("Es necesario ingresar el detalle de la orden con los datos del pesaje inicial y el producto").build();
         }
     }
-        /*
-    }*/
+
+    private Orden updateOrden(Orden ordenVieja, Orden ordenNueva) throws BusinessException {
+        Random rand = new Random();
+        if(ordenNueva.getEstado() == 1) {
+            ordenNueva.setDetalleOrden(ordenVieja.getDetalleOrden());
+            ordenNueva.setEstado(2);
+            ordenNueva.getDetalleOrden().setFechaRecepcionPesajeInicial(new Date());
+            ordenNueva.setPassword((int) Math.floor(Math.random()*(MAXIMO-MINIMO+1)+MINIMO));
+            return ordenDAO.save(ordenNueva);
+        }else{
+            throw BusinessException.builder().message("La orden especificada ya pertenece a un estado superior por lo que tiene asignada una tara").build();
+        }
+    }
+
+
 }
