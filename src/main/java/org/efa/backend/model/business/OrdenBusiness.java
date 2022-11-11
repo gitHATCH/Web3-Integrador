@@ -6,6 +6,7 @@ import org.aspectj.weaver.ast.Or;
 import org.efa.backend.exceptions.custom.BusinessException;
 import org.efa.backend.exceptions.custom.FoundException;
 import org.efa.backend.exceptions.custom.NotFoundException;
+import org.efa.backend.model.DetalleCarga;
 import org.efa.backend.model.DetalleOrden;
 import org.efa.backend.model.Orden;
 import org.efa.backend.model.persistence.OrdenRepository;
@@ -170,6 +171,37 @@ public class OrdenBusiness implements IOrdenBusiness{
         }else{
             throw BusinessException.builder().message("Es necesario ingresar el detalle de la orden con los datos del pesaje inicial").build();
         }
+    }
+
+    @Override
+    public Orden turnOnBomb(Orden orden) throws NotFoundException, BusinessException {
+        if(orden.getPreset() != null && orden.getPassword() != null){
+            try {
+                Long id = ordenDAO.idOrdenBomb(orden.getPassword(),orden.getPreset());
+                if(id != null) {
+                    Orden ordenNueva = loadById(id);
+                    if (ordenNueva.getEstado() == 2 && ordenNueva.getDetalleOrden().getDetalleCarga() == null) {
+                        ordenNueva.getDetalleOrden().setDetalleCarga(new DetalleCarga());
+                        ordenNueva.getDetalleOrden().getDetalleCarga().setMasa(0);
+                        ordenNueva.getDetalleOrden().getDetalleCarga().setDensidad(0);
+                        ordenNueva.getDetalleOrden().getDetalleCarga().setCaudal(0);
+                        ordenNueva.getDetalleOrden().getDetalleCarga().setTemperatura(0);
+                        return ordenDAO.save(ordenNueva);
+                    } else {
+                        throw BusinessException.builder().message("La orden asociada ya se encuentra en proceso").build();
+                    }
+                }else{
+                    throw NotFoundException.builder().message("No se encontró ninguna orden asociada a esa password y preset").build();
+                }
+            }catch (Exception e){
+                log.error(e.getMessage(), e);
+                throw BusinessException.builder().ex(e).build();
+            }
+        }else{
+            throw BusinessException.builder().message("Es encesario ingresar el preset y la password asociada").build();
+        }
+
+
     }
 
     private Integer updateOrden(Orden ordenVieja, Orden ordenNueva) throws BusinessException {

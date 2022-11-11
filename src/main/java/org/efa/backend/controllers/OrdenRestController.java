@@ -1,5 +1,6 @@
 package org.efa.backend.controllers;
 
+import org.aspectj.weaver.ast.Or;
 import org.efa.backend.exceptions.custom.BusinessException;
 import org.efa.backend.exceptions.custom.FoundException;
 import org.efa.backend.exceptions.custom.NotFoundException;
@@ -116,6 +117,19 @@ public class OrdenRestController {
         try {
             Integer password = ordenBusiness.addTara(orden);
             return new ResponseEntity<>("Password: " + password, HttpStatus.OK);
+        } catch (BusinessException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping(value = "/encenderBomba")
+    public ResponseEntity<?> turnOnBomb(@RequestBody Orden orden) {
+        try {
+            Orden ordenNueva = ordenBusiness.turnOnBomb(orden);
+            return new ResponseEntity<>("Bomba encendida para la orden numero "+ordenNueva.getNumero()+" y camión de patente "+ordenNueva.getCamion().getPatente(),HttpStatus.OK);
         } catch (BusinessException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
