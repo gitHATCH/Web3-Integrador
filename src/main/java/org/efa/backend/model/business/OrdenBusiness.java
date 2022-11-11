@@ -1,6 +1,7 @@
 package org.efa.backend.model.business;
 
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Not;
 import org.aspectj.weaver.ast.Or;
 import org.efa.backend.exceptions.custom.BusinessException;
 import org.efa.backend.exceptions.custom.FoundException;
@@ -76,107 +77,23 @@ public class OrdenBusiness implements IOrdenBusiness{
 
     @Override
     public Orden add(Orden orden) throws FoundException, BusinessException{
-
-        boolean noForeignFlag = false;
-        String[] foreignData = new String[]{};
-
         try {
             load(orden.getNumero());
             throw FoundException.builder().message("Ya existe la orden numero '" + orden.getNumero()).build();
         } catch (NotFoundException ex) {
-            //No existe -> procede a crear
-            //Caused by: java.sql.SQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`iw3final_db`.`ordenes`, CONSTRAINT `FKs4be0s7apibundgy9mked55xc` FOREIGN KEY (`id_camion`) REFERENCES `camiones` (`id`))
-            //TODO: Detectar cuando una foranea no existe y dar mensaje personalizado
             try {
-
-                //Control Camion
-                if(orden.getCamion().getId() != null){
-                    try {
-                        camion.loadById(orden.getCamion().getId());
-                    } catch(NotFoundException e){
-                        foreignData = new String[]{"camion","id",orden.getCamion().getId().toString()};
-                        noForeignFlag = true;
-                    }
-                }else{
-                    if(orden.getCamion().getPatente() != null) {
-                        try {
-                            orden.setCamion(camion.load(orden.getCamion().getPatente()));
-                        } catch (NotFoundException e) {
-                            foreignData = new String[]{"camion", "patente", orden.getCamion().getPatente()};
-                            noForeignFlag = true;
-                        }
-                    }
-                }
-
-                //Control Chofer
-                if(orden.getChofer().getId() != null){
-                    try {
-                        chofer.loadById(orden.getChofer().getId());
-                    } catch(NotFoundException e){
-                        foreignData = new String[]{"chofer","id",orden.getChofer().getId().toString()};
-                        noForeignFlag = true;
-                    }
-                }else{
-                    if(orden.getChofer().getDni() != null) {
-                        try {
-                            orden.setChofer(chofer.load(orden.getChofer().getDni()));
-                        } catch (NotFoundException e) {
-                            foreignData = new String[]{"chofer", "dni", orden.getChofer().getDni().toString()};
-                            noForeignFlag = true;
-                        }
-                    }
-                }
-
-                //Control Cliente
-                if(orden.getCliente().getId() != null){
-                    try {
-                        cliente.loadById(orden.getCliente().getId());
-                    } catch(NotFoundException e){
-                        foreignData = new String[]{"cliente","id",orden.getCliente().getId().toString()};
-                        noForeignFlag = true;
-                    }
-                }else{
-                    if(orden.getCliente().getRazonSocial() != null) {
-                        try {
-                            orden.setCliente(cliente.load(orden.getCliente().getRazonSocial()));
-                        } catch (NotFoundException e) {
-                            foreignData = new String[]{"cliente", "razon social", orden.getCliente().getRazonSocial()};
-                            noForeignFlag = true;
-                        }
-                    }
-                }
-
-                //Control Producto
-                if(orden.getProducto().getId() != null){
-                    try {
-                        producto.loadById(orden.getProducto().getId());
-                    } catch(NotFoundException e){
-                        foreignData = new String[]{"producto","id",orden.getProducto().getId().toString()};
-                        noForeignFlag = true;
-                    }
-                }else{
-                    if(orden.getProducto().getNombre() != null) {
-                        try {
-                            orden.setProducto(producto.load(orden.getProducto().getNombre()));
-                        } catch (NotFoundException e) {
-                            foreignData = new String[]{"producto", "nombre", orden.getProducto().getNombre()};
-                            noForeignFlag = true;
-                        }
-                    }
-                }
-
-
+                //Control Entidades
+                addOrdenCamionController(orden);
+                addOrdenChoferController(orden);
+                addOrdenClienteController(orden);
+                addOrdenProductoController(orden);
 
                 orden.setEstado(1);
                 orden.setDetalleOrden(null);
                 return ordenDAO.save(orden);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
-                if(noForeignFlag){
-                    throw BusinessException.builder().message("El "+foreignData[0]+" con "+foreignData[1]+" "+foreignData[2]+" no se encuentra").build();
-                }else{
-                    throw BusinessException.builder().ex(e).build();
-                }
+                throw BusinessException.builder().ex(e).build();
             }
         }
     }
@@ -268,28 +185,88 @@ public class OrdenBusiness implements IOrdenBusiness{
         }
     }
 
-    /*
-    private String[] addOrdenCamionController(Orden orden) {
+
+    private void addOrdenCamionController(Orden orden) throws BusinessException {
                 if(orden.getCamion().getId() != null){
                     try {
                         camion.loadById(orden.getCamion().getId());
                     } catch(NotFoundException e){
-                        foreignData = new String[]{"camion","id",orden.getCamion().getId().toString()}; //
-                        noForeignFlag = true; //
+                        log.error(e.getMessage(), e);
+                        throw BusinessException.builder().message("El camion de id "+orden.getCamion().getId()+" no se encuentra").build();
                     }
                 }else{
                     if(orden.getCamion().getPatente() != null) {
                         try {
                             orden.setCamion(camion.load(orden.getCamion().getPatente()));
                         } catch (NotFoundException e) {
-                            foreignData = new String[]{"camion", "patente", orden.getCamion().getPatente()};
-                            noForeignFlag = true;
+                            log.error(e.getMessage(), e);
+                            throw BusinessException.builder().message("El camion de patente "+orden.getCamion().getPatente()+" no se encuentra").build();
                         }
                     }
                 }
     }
 
-    */
+    private void addOrdenChoferController(Orden orden) throws BusinessException {
+        if(orden.getChofer().getId() != null){
+            try {
+                chofer.loadById(orden.getChofer().getId());
+            } catch(NotFoundException e){
+                log.error(e.getMessage(), e);
+                throw BusinessException.builder().message("El chofer de id "+orden.getChofer().getId()+" no se encuentra").build();
+            }
+        }else{
+            if(orden.getChofer().getDni() != null) {
+                try {
+                    orden.setChofer(chofer.load(orden.getChofer().getDni()));
+                } catch (NotFoundException e) {
+                    log.error(e.getMessage(), e);
+                    throw BusinessException.builder().message("El chofer de dni "+orden.getChofer().getDni()+" no se encuentra").build();
+                }
+            }
+        }
+    }
+
+    private void addOrdenClienteController(Orden orden) throws BusinessException {
+        if(orden.getCliente().getId() != null){
+            try {
+                cliente.loadById(orden.getCliente().getId());
+            } catch(NotFoundException e){
+                log.error(e.getMessage(), e);
+                throw BusinessException.builder().message("El cliente de id "+orden.getCliente().getId()+" no se encuentra").build();
+            }
+        }else{
+            if(orden.getCliente().getRazonSocial() != null) {
+                try {
+                    orden.setCliente(cliente.load(orden.getCliente().getRazonSocial()));
+                } catch (NotFoundException e) {
+                    log.error(e.getMessage(), e);
+                    throw BusinessException.builder().message("El cliente de razon social "+orden.getCliente().getRazonSocial()+" no se encuentra").build();
+                }
+            }
+        }
+    }
+
+    private void addOrdenProductoController(Orden orden) throws BusinessException {
+        if(orden.getProducto().getId() != null){
+            try {
+                producto.loadById(orden.getProducto().getId());
+            } catch(NotFoundException e){
+                log.error(e.getMessage(), e);
+                throw BusinessException.builder().message("El producto de id "+orden.getProducto().getId()+" no se encuentra").build();
+            }
+        }else{
+            if(orden.getProducto().getNombre() != null) {
+                try {
+                    orden.setProducto(producto.load(orden.getProducto().getNombre()));
+                } catch (NotFoundException e) {
+                    log.error(e.getMessage(), e);
+                    throw BusinessException.builder().message("El producto de nombre "+orden.getProducto().getNombre()+" no se encuentra").build();
+                }
+            }
+        }
+    }
+
+
 
 
 }
