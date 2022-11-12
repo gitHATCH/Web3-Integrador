@@ -16,6 +16,4 @@ public interface OrdenRepository extends JpaRepository<Orden, Long> {
 
     void deleteById(Long id);
 
-    @Query(value = "SELECT id FROM ordenes o where o.password = :passValue AND o.preset = :presetValue", nativeQuery = true)
-    Long idOrdenBomb(Integer passValue, Integer presetValue);
 }

@@ -6,6 +6,7 @@ import org.efa.backend.exceptions.custom.BusinessException;
 import org.efa.backend.exceptions.custom.FoundException;
 import org.efa.backend.exceptions.custom.NotFoundException;
 import org.efa.backend.miscellaneous.Paths;
+import org.efa.backend.model.DetalleCarga;
 import org.efa.backend.model.Orden;
 import org.efa.backend.model.Serializers.OrdenEstado2JSONSerializer;
 import org.efa.backend.model.business.IOrdenBusiness;
@@ -142,6 +143,31 @@ public class OrdenRestController {
         try {
             Orden ordenNueva = ordenBusiness.turnOnBomb(orden);
             return new ResponseEntity<>("Bomba encendida para la orden numero "+ordenNueva.getNumero()+" y camión de patente "+ordenNueva.getCamion().getPatente(),HttpStatus.OK);
+        } catch (BusinessException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping(value = "/obtenerCargaActual/{numero}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> loadCargaActual(@PathVariable("numero") long numero) {
+        try {
+            return new ResponseEntity<>(ordenBusiness.getCargaActual(numero), HttpStatus.OK);
+        } catch (BusinessException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping(value = "/cargar/{numero}")
+    public ResponseEntity<?> loadCamion(@PathVariable("numero") long numero, @RequestBody DetalleCarga detalleCarga) {
+        try {
+            ordenBusiness.cargarCamion(numero,detalleCarga);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (BusinessException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR);

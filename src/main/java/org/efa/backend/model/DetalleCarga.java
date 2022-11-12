@@ -20,17 +20,17 @@ public class DetalleCarga {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = true)
-    private Integer masa;
+    @Column(nullable = false)
+    private float masa;
 
-    @Column(nullable = true)
-    private Integer densidad;
+    @Column(nullable = false)
+    private float densidad;
 
-    @Column(nullable = true)
-    private Integer temperatura;
+    @Column(nullable = false)
+    private float temperatura;
 
-    @Column(nullable = true)
-    private Integer caudal;
+    @Column(nullable = false)
+    private float caudal;
 
     @Column(nullable = false)
     private Date fechaRecepcionCarga;
