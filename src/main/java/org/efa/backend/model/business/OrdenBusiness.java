@@ -175,39 +175,44 @@ public class OrdenBusiness implements IOrdenBusiness{
 
     @Override
     public Orden turnOnBomb(Orden orden) throws NotFoundException, BusinessException {
-        if(orden.getPreset() != null && orden.getPassword() != null){
+        if(orden.getNumero() != null && orden.getPassword() != null){
             try {
-                Long id = ordenDAO.idOrdenBomb(orden.getPassword(),orden.getPreset());
-                if(id != null) {
-                    Orden ordenNueva = loadById(id);
-                    if (ordenNueva.getEstado() == 2 && ordenNueva.getDetalleOrden().getDetalleCarga() == null) {
-                        ordenNueva.getDetalleOrden().setDetalleCarga(new DetalleCarga());
-                        ordenNueva.getDetalleOrden().getDetalleCarga().setMasa(0);
-                        ordenNueva.getDetalleOrden().getDetalleCarga().setDensidad(0);
-                        ordenNueva.getDetalleOrden().getDetalleCarga().setCaudal(0);
-                        ordenNueva.getDetalleOrden().getDetalleCarga().setTemperatura(0);
+                Orden ordenNueva = load(orden.getNumero());
+                if(ordenNueva.getPassword().equals(orden.getPassword())) {
+                    if (ordenNueva.getEstado() == 2 && ordenNueva.getDetalleOrden().getDetallesCarga().isEmpty()) {
+                        ordenNueva.getDetalleOrden().setFechaInicioCarga(new Date());
+                        ordenNueva.getDetalleOrden().getDetallesCarga().add(new DetalleCarga());
+                        ordenNueva.getDetalleOrden().getDetallesCarga().get(0).setFechaRecepcionCarga(new Date());
+                        ordenNueva.getDetalleOrden().getDetallesCarga().get(0).setMasa(0);
+                        ordenNueva.getDetalleOrden().getDetallesCarga().get(0).setDensidad(0);
+                        ordenNueva.getDetalleOrden().getDetallesCarga().get(0).setCaudal(0);
+                        ordenNueva.getDetalleOrden().getDetallesCarga().get(0).setTemperatura(0);
+                        //Encender Schedule de carga
                         return ordenDAO.save(ordenNueva);
                     } else {
                         throw BusinessException.builder().message("La orden asociada ya se encuentra en proceso").build();
                     }
                 }else{
-                    throw NotFoundException.builder().message("No se encontró ninguna orden asociada a esa password y preset").build();
+                    throw NotFoundException.builder().message("No se encontró ninguna orden asociada a esa password").build();
                 }
-            }catch (Exception e){
+            }catch (NotFoundException e){
+                log.error(e.getMessage(), e);
+                throw NotFoundException.builder().ex(e).build();
+            }
+            catch (Exception e){
                 log.error(e.getMessage(), e);
                 throw BusinessException.builder().ex(e).build();
             }
         }else{
-            throw BusinessException.builder().message("Es encesario ingresar el preset y la password asociada").build();
+            throw BusinessException.builder().message("Es encesario ingresar el numero de orden y la password asociada").build();
         }
-
-
     }
 
     private Orden updateOrden(Orden ordenVieja, Orden ordenNueva) throws BusinessException {
         if(ordenNueva.getEstado() == 1) {
             ordenNueva.setDetalleOrden(ordenVieja.getDetalleOrden());
             ordenNueva.setEstado(2);
+            ordenNueva.getDetalleOrden().setDetallesCarga(null);
             ordenNueva.getDetalleOrden().setFechaRecepcionPesajeInicial(new Date());
             ordenNueva.setPassword((int) Math.floor(Math.random()*(MAXIMO-MINIMO+1)+MINIMO));
             return ordenDAO.save(ordenNueva);

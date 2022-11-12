@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name="detallesOrdenes")
@@ -19,9 +20,6 @@ public class DetalleOrden {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = true)
-    private Date fechaRecepcionCarga;
 
     @Column(nullable = false)
     private Date fechaRecepcionPesajeInicial;
@@ -38,7 +36,7 @@ public class DetalleOrden {
     @Column(nullable = false)
     private Integer pesajeInicial;
 
-    @OneToOne(cascade= CascadeType.ALL)
-    @JoinColumn(name = "id_detalleCarga", nullable = true)
-    private DetalleCarga detalleCarga;
+    @OneToMany(cascade= CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "id_detalleOrden", nullable = true)
+    private List<DetalleCarga> detallesCarga;
 }
