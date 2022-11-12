@@ -1,13 +1,16 @@
 package org.efa.backend.controllers;
 
-import org.aspectj.weaver.ast.Or;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import org.efa.backend.exceptions.custom.BusinessException;
 import org.efa.backend.exceptions.custom.FoundException;
 import org.efa.backend.exceptions.custom.NotFoundException;
 import org.efa.backend.miscellaneous.Paths;
 import org.efa.backend.model.Orden;
+import org.efa.backend.model.Serializers.OrdenEstado2JSONSerializer;
 import org.efa.backend.model.business.IOrdenBusiness;
 import org.efa.backend.utils.IStandardResponseBusiness;
+import org.efa.backend.utils.JsonUtiles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -114,14 +117,23 @@ public class OrdenRestController {
 
     @PutMapping(value = "/tara")
     public ResponseEntity<?> setTara(@RequestBody Orden orden) {
+        StdSerializer<Orden> serializer = new OrdenEstado2JSONSerializer(Orden.class, false);
         try {
-            Integer password = ordenBusiness.addTara(orden);
-            return new ResponseEntity<>("Password: " + password, HttpStatus.OK);
+//            Integer password = ordenBusiness.addTara(orden);
+
+            String result = JsonUtiles.getObjectMapper(Orden.class,serializer, null).writeValueAsString(ordenBusiness.addTara(orden));
+
+            return new ResponseEntity<>(result, HttpStatus.OK);
+//            return new ResponseEntity<>("Password: " + password, HttpStatus.OK);
         } catch (BusinessException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
+        } catch (JsonProcessingException e) {
+//            throw new RuntimeException(e);
+            return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

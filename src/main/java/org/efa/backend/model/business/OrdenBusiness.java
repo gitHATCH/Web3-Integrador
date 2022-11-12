@@ -133,7 +133,7 @@ public class OrdenBusiness implements IOrdenBusiness{
     }
 
     @Override
-    public Integer addTara(Orden orden) throws NotFoundException, BusinessException {
+    public Orden addTara(Orden orden) throws NotFoundException, BusinessException {
         Orden ordenNueva;
         if(orden.getDetalleOrden() != null) {
             if (orden.getId() != null) {
@@ -161,7 +161,7 @@ public class OrdenBusiness implements IOrdenBusiness{
                     }
                 } else {
                     try {
-                        return ordenDAO.save(orden).getPassword();
+                        return ordenDAO.save(orden);
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
                         throw BusinessException.builder().ex(e).build();
@@ -204,14 +204,13 @@ public class OrdenBusiness implements IOrdenBusiness{
 
     }
 
-    private Integer updateOrden(Orden ordenVieja, Orden ordenNueva) throws BusinessException {
-        Random rand = new Random();
+    private Orden updateOrden(Orden ordenVieja, Orden ordenNueva) throws BusinessException {
         if(ordenNueva.getEstado() == 1) {
             ordenNueva.setDetalleOrden(ordenVieja.getDetalleOrden());
             ordenNueva.setEstado(2);
             ordenNueva.getDetalleOrden().setFechaRecepcionPesajeInicial(new Date());
             ordenNueva.setPassword((int) Math.floor(Math.random()*(MAXIMO-MINIMO+1)+MINIMO));
-            return ordenDAO.save(ordenNueva).getPassword();
+            return ordenDAO.save(ordenNueva);
         }else{
             throw BusinessException.builder().message("La orden especificada ya pertenece a un estado superior por lo que tiene asignada una tara").build();
         }
