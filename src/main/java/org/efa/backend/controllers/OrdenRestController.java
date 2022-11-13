@@ -176,4 +176,19 @@ public class OrdenRestController {
         }
     }
 
+    @PutMapping(value = "/apagarBomba")
+    public ResponseEntity<?> turnOffBomb(@RequestParam(name = "numero") Long numero,
+                                         @RequestParam(name = "password") int password
+                                         ) {
+        try {
+            Orden ordenNueva = ordenBusiness.turnOffBomb(numero, password);
+            return new ResponseEntity<>(ordenNueva,HttpStatus.OK);
+        } catch (BusinessException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
+        }
+    }
+
 }
