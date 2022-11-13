@@ -7,6 +7,7 @@ import org.efa.backend.exceptions.custom.NotFoundException;
 import org.efa.backend.model.DetalleCarga;
 import org.efa.backend.model.Orden;
 import org.efa.backend.model.persistence.OrdenRepository;
+import org.efa.backend.utils.EmailBusiness;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,9 @@ public class OrdenBusiness implements IOrdenBusiness {
 
     @Autowired
     private ClienteBusiness cliente;
+
+    @Autowired
+    private EmailBusiness emailBusiness;
 
     @Override
     public Orden load(long numero) throws BusinessException, NotFoundException {
@@ -156,7 +160,7 @@ public class OrdenBusiness implements IOrdenBusiness {
                     }
                 } else {
                     try {
-                        return ordenDAO.save(orden);
+                        return ordenDAO.save(orden); //Dudas respecto a esto
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
                         throw BusinessException.builder().ex(e).build();
@@ -213,6 +217,9 @@ public class OrdenBusiness implements IOrdenBusiness {
             ordenNueva.getDetalleOrden().setDetallesCarga(null);
             ordenNueva.getDetalleOrden().setFechaRecepcionPesajeInicial(new Date());
             ordenNueva.setPassword((int) Math.floor(Math.random() * (MAXIMO - MINIMO + 1) + MINIMO));
+            if(System.getenv("MAIL_USERNAME") != null){
+                emailBusiness.sendSimpleMessage(System.getenv("MAIL_USERNAME"),"Clave generada exitosamente","Su ping generado es: '"+ordenNueva.getPassword()+"' . Por favor conservelo por seguridad");
+            }
             return ordenDAO.save(ordenNueva);
         } else {
             throw BusinessException.builder().message("La orden especificada ya pertenece a un estado superior por lo que tiene asignada una tara").build();
@@ -389,30 +396,32 @@ public class OrdenBusiness implements IOrdenBusiness {
 
     @Override
     public Orden turnOffBomb(Long numero, int password) throws NotFoundException, BusinessException {
-        //Este esta de mas
-//        if (orden.getNumero() != null && orden.getPassword() != null) {
-//            throw BusinessException.builder().message("Es necesario ingresar la password y el numero de orden").build();
-//        }
         Orden orden = load(numero);
+
         if (!orden.getPassword().equals(password)) {
             throw NotFoundException.builder().message("La password y el numero de orden no coinciden").build();
+        }
+        if (orden.getDetalleOrden().getDetallesCarga().isEmpty()) {
+            throw BusinessException.builder().message("Es encesario encender la bomba primero").build();
         }
         if (orden.getEstado() != 2) {
             throw BusinessException.builder().message("La orden asociada no se encuentra en el estado requerido").build();
         }
+
             orden.setEstado(3);
             orden.getDetalleOrden().setFechaFinCarga(new Date());
             return update(orden);
 }
 
-//    @Override
-    public Orden cerrarOrden(Float pesajeFinal, Long numero) throws BusinessException, NotFoundException {
+    @Override
+    public Orden cerrarOrden(Long numero) throws BusinessException, NotFoundException {
         Orden orden = load(numero);
         //VALIDA SI LA ORDEN ESTA EN ESTADO 3
         if(!orden.getEstado().equals(3)){
             throw BusinessException.builder().message("La orden asociada no se encuentra en el estado requerido").build();
         }
-        orden.getDetalleOrden().setPesajeFinal(pesajeFinal);
+        orden.getDetalleOrden().setPesajeFinal(orden.getDetalleOrden().getPesajeInicial() +
+                orden.getDetalleOrden().getDetallesCarga().get(orden.getDetalleOrden().getDetallesCarga().size()-1).getMasa());
         orden.getDetalleOrden().setFechaRecepcionFinal(new Date());
         orden.setEstado(4);
         update(orden);
@@ -420,7 +429,7 @@ public class OrdenBusiness implements IOrdenBusiness {
     }
 
     //TODO: ACA PODRIAMOS HACER UNA SLIMVIEW
-//    @Override
+    @Override
     public Orden concilacion(Long numero) throws BusinessException, NotFoundException {
         Orden orden = load(numero);
         //VALIDA SI LA ORDEN ESTA EN ESTADO 4

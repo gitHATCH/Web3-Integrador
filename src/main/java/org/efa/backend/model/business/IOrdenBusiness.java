@@ -31,5 +31,10 @@ public interface IOrdenBusiness {
     DetalleCarga getCargaActual(long numero) throws NotFoundException, BusinessException;
 
     void cargarCamion(long numero, DetalleCarga detalleCarga) throws BusinessException, NotFoundException;
+
     Orden turnOffBomb(Long numero, int password) throws NotFoundException, BusinessException;
+
+    Orden cerrarOrden(Long numero) throws BusinessException, NotFoundException;
+
+    Orden concilacion(Long numero) throws BusinessException, NotFoundException;
 }

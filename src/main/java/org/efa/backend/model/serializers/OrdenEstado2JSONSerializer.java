@@ -1,4 +1,4 @@
-package org.efa.backend.model.Serializers;
+package org.efa.backend.model.serializers;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;

@@ -8,7 +8,7 @@ import org.efa.backend.exceptions.custom.NotFoundException;
 import org.efa.backend.miscellaneous.Paths;
 import org.efa.backend.model.DetalleCarga;
 import org.efa.backend.model.Orden;
-import org.efa.backend.model.Serializers.OrdenEstado2JSONSerializer;
+import org.efa.backend.model.serializers.OrdenEstado2JSONSerializer;
 import org.efa.backend.model.business.IOrdenBusiness;
 import org.efa.backend.utils.IStandardResponseBusiness;
 import org.efa.backend.utils.JsonUtiles;
@@ -183,6 +183,33 @@ public class OrdenRestController {
         try {
             Orden ordenNueva = ordenBusiness.turnOffBomb(numero, password);
             return new ResponseEntity<>(ordenNueva,HttpStatus.OK);
+        } catch (BusinessException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    //TODO: AGREGAR SERIALIZER
+    @PutMapping(value = "/cerrarOrden")
+    public ResponseEntity<?> cerrarOrden(@RequestParam(name = "numero") Long numero ) {
+        try {
+            Orden orden = ordenBusiness.cerrarOrden(numero);
+            return new ResponseEntity<>(orden,HttpStatus.OK);
+        } catch (BusinessException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    //TODO: AGREGAR SERIALIZER
+    @GetMapping(value = "/conciliacion/{numero}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getConciliacion(@PathVariable("numero") long numero) {
+        try {
+            return new ResponseEntity<>(ordenBusiness.concilacion(numero), HttpStatus.OK);
         } catch (BusinessException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,6 +1,7 @@
 package org.efa.backend.model.persistence;
 
 import org.efa.backend.model.Orden;
+import org.efa.backend.model.views.IConciliacionSlimView;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -15,5 +16,7 @@ public interface OrdenRepository extends JpaRepository<Orden, Long> {
     Optional<Orden> findById(Long id);
 
     void deleteById(Long id);
+
+
 
 }
