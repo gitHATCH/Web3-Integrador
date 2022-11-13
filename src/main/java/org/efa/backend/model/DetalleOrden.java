@@ -36,6 +36,9 @@ public class DetalleOrden {
     @Column(nullable = false)
     private Integer pesajeInicial;
 
+    @Column(nullable = true)
+    private Float pesajeFinal;
+
     @OneToMany(cascade= CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "id_detalleOrden", nullable = true)
     private List<DetalleCarga> detallesCarga;

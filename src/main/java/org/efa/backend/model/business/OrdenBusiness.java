@@ -404,4 +404,30 @@ public class OrdenBusiness implements IOrdenBusiness {
             orden.getDetalleOrden().setFechaFinCarga(new Date());
             return update(orden);
 }
+
+//    @Override
+    public Orden cerrarOrden(Float pesajeFinal, Long numero) throws BusinessException, NotFoundException {
+        Orden orden = load(numero);
+        //VALIDA SI LA ORDEN ESTA EN ESTADO 3
+        if(!orden.getEstado().equals(3)){
+            throw BusinessException.builder().message("La orden asociada no se encuentra en el estado requerido").build();
+        }
+        orden.getDetalleOrden().setPesajeFinal(pesajeFinal);
+        orden.getDetalleOrden().setFechaRecepcionFinal(new Date());
+        orden.setEstado(4);
+        update(orden);
+        return concilacion(numero);
+    }
+
+    //TODO: ACA PODRIAMOS HACER UNA SLIMVIEW
+//    @Override
+    public Orden concilacion(Long numero) throws BusinessException, NotFoundException {
+        Orden orden = load(numero);
+        //VALIDA SI LA ORDEN ESTA EN ESTADO 4
+        if(!orden.getEstado().equals(4)){
+            throw BusinessException.builder().message("La orden asociada no se encuentra en el estado requerido").build();
+        }
+        //TODO: HACER SERIALIZER
+        return orden;
+    }
 }
