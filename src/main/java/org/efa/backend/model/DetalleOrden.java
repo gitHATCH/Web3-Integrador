@@ -34,7 +34,7 @@ public class DetalleOrden {
     private Date fechaRecepcionFinal;
 
     @Column(nullable = false)
-    private Integer pesajeInicial;
+    private Float pesajeInicial;
 
     @Column(nullable = true)
     private Float pesajeFinal;

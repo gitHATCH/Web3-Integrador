@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -57,6 +58,32 @@ public final class JsonUtiles {
         for (String attr : attrs) {
             if (node.get(attr) != null && node.get(attr).isDouble()) {
                 r = node.get(attr).asDouble();
+                break;
+            }
+        }
+        if (r == null)
+            r = defaultValue;
+        return r;
+    }
+
+    public static float getFloat(JsonNode node, String[] attrs, float defaultValue) {
+        Float r = null;
+        for (String attr : attrs) {
+            if (node.get(attr) != null && node.get(attr).isFloat()) {
+                r = node.get(attr).floatValue();
+                break;
+            }
+        }
+        if (r == null)
+            r = defaultValue;
+        return r;
+    }
+
+    public static int getInteger(JsonNode node, String[] attrs, int defaultValue) {
+        Integer r = null;
+        for (String attr : attrs) {
+            if (node.get(attr) != null && node.get(attr).isInt()) {
+                r = node.get(attr).asInt();
                 break;
             }
         }

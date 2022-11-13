@@ -1,9 +1,6 @@
 package org.efa.backend.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -13,6 +10,7 @@ import java.util.Date;
 @Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DetalleCarga {
@@ -21,16 +19,16 @@ public class DetalleCarga {
     private Long id;
 
     @Column(nullable = false)
-    private float masa;
+    private Float masa;
 
     @Column(nullable = false)
-    private float densidad;
+    private Float densidad;
 
     @Column(nullable = false)
-    private float temperatura;
+    private Float temperatura;
 
     @Column(nullable = false)
-    private float caudal;
+    private Float caudal;
 
     @Column(nullable = false)
     private Date fechaRecepcionCarga;

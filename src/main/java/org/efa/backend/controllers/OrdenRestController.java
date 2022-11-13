@@ -10,13 +10,11 @@ import org.efa.backend.model.DetalleCarga;
 import org.efa.backend.model.Orden;
 import org.efa.backend.model.serializers.OrdenEstado2JSONSerializer;
 import org.efa.backend.model.business.IOrdenBusiness;
+import org.efa.backend.model.views.IConciliacionSlimView;
 import org.efa.backend.utils.IStandardResponseBusiness;
 import org.efa.backend.utils.JsonUtiles;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -191,12 +189,11 @@ public class OrdenRestController {
         }
     }
 
-    //TODO: AGREGAR SERIALIZER
     @PutMapping(value = "/cerrarOrden")
     public ResponseEntity<?> cerrarOrden(@RequestParam(name = "numero") Long numero ) {
         try {
-            Orden orden = ordenBusiness.cerrarOrden(numero);
-            return new ResponseEntity<>(orden,HttpStatus.OK);
+            IConciliacionSlimView conciliacion = ordenBusiness.cerrarOrden(numero);
+            return new ResponseEntity<>(conciliacion,HttpStatus.OK);
         } catch (BusinessException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
@@ -205,7 +202,6 @@ public class OrdenRestController {
         }
     }
 
-    //TODO: AGREGAR SERIALIZER
     @GetMapping(value = "/conciliacion/{numero}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getConciliacion(@PathVariable("numero") long numero) {
         try {
@@ -215,6 +211,21 @@ public class OrdenRestController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping(value = "/b2b")
+    public ResponseEntity<?> addExternal(HttpEntity<String> httpEntity) {
+        try {
+            Orden response = ordenBusiness.addExternal(httpEntity.getBody());
+            HttpHeaders responseHeaders = new HttpHeaders();
+            //responseHeaders.set("location", Constants.URL_INTEGRATION_CLI1 + "/products/" + response.getCodCli1());
+            return new ResponseEntity<>(responseHeaders, HttpStatus.CREATED);
+        } catch (BusinessException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (FoundException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.FOUND, e, e.getMessage()), HttpStatus.FOUND);
         }
     }
 

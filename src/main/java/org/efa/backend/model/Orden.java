@@ -20,13 +20,16 @@ public class Orden {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    private String codigoExterno;
+
+    @Column(nullable = false, unique = true)
     private Long numero;
 
     @Column(nullable = false)
     private Integer estado;
 
     @Column(nullable = false)
-    private Integer preset;
+    private Float preset;
 
     @Column(length = 5, nullable = true)
     private Integer password;

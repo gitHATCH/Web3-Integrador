@@ -4,8 +4,8 @@ import org.efa.backend.exceptions.custom.BusinessException;
 import org.efa.backend.exceptions.custom.FoundException;
 import org.efa.backend.exceptions.custom.NotFoundException;
 import org.efa.backend.model.DetalleCarga;
-import org.efa.backend.model.DetalleOrden;
 import org.efa.backend.model.Orden;
+import org.efa.backend.model.views.IConciliacionSlimView;
 
 import java.util.List;
 
@@ -32,9 +32,11 @@ public interface IOrdenBusiness {
 
     void cargarCamion(long numero, DetalleCarga detalleCarga) throws BusinessException, NotFoundException;
 
-    Orden turnOffBomb(Long numero, int password) throws NotFoundException, BusinessException;
+    Orden turnOffBomb(Long numero, Integer password) throws NotFoundException, BusinessException;
 
-    Orden cerrarOrden(Long numero) throws BusinessException, NotFoundException;
+    IConciliacionSlimView cerrarOrden(Long numero) throws BusinessException, NotFoundException;
 
-    Orden concilacion(Long numero) throws BusinessException, NotFoundException;
+    IConciliacionSlimView concilacion(Long numero) throws BusinessException, NotFoundException;
+
+    public Orden addExternal(String json) throws FoundException, BusinessException;
 }
