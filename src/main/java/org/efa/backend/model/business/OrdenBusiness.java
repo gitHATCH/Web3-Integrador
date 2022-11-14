@@ -14,8 +14,6 @@ import org.efa.backend.model.views.IConciliacionSlimView;
 import org.efa.backend.utils.EmailBusiness;
 import org.efa.backend.utils.JsonUtiles;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -141,63 +139,55 @@ public class OrdenBusiness implements IOrdenBusiness {
     @Override
     public Orden addTara(Orden orden) throws NotFoundException, BusinessException {
         Orden ordenNueva;
-        if (orden.getDetalleOrden() != null) {
-            if (orden.getId() != null) {
+        if (orden.getDetalleOrden() == null) {
+            throw BusinessException.builder().message("Es necesario ingresar el detalle de la orden con los datos del pesaje inicial").build();
+        }
+        if (orden.getId() != null) {
+            try {
+                ordenNueva = loadById(orden.getId());
+                return upgradeOrden(orden, ordenNueva);
+            } catch (NotFoundException e) {
+                log.error(e.getMessage(), e);
+                throw NotFoundException.builder().message("No se encuentra la orden con id " + orden.getId()).build();
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                throw BusinessException.builder().ex(e).build();
+            }
+        } else {
+            if (orden.getNumero() != null) {
                 try {
-                    ordenNueva = loadById(orden.getId());
+                    ordenNueva = load(orden.getNumero());
                     return upgradeOrden(orden, ordenNueva);
                 } catch (NotFoundException e) {
                     log.error(e.getMessage(), e);
-                    throw NotFoundException.builder().message("No se encuentra la orden con id " + orden.getId()).build();
+                    throw NotFoundException.builder().message("No se encuentra la orden con numero " + orden.getNumero()).build();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     throw BusinessException.builder().ex(e).build();
                 }
             } else {
-                if (orden.getNumero() != null) {
-                    try {
-                        ordenNueva = load(orden.getNumero());
-                        return upgradeOrden(orden, ordenNueva);
-                    } catch (NotFoundException e) {
-                        log.error(e.getMessage(), e);
-                        throw NotFoundException.builder().message("No se encuentra la orden con numero " + orden.getNumero()).build();
-                    } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-                        throw BusinessException.builder().ex(e).build();
-                    }
-                } else {
-                    try {
-                        return ordenDAO.save(orden); //Dudas respecto a esto
-                    } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-                        throw BusinessException.builder().ex(e).build();
-                    }
-                }
+                return update(orden);
             }
-        } else {
-            throw BusinessException.builder().message("Es necesario ingresar el detalle de la orden con los datos del pesaje inicial").build();
         }
     }
 
     private Orden upgradeOrden(Orden ordenVieja, Orden ordenNueva) throws BusinessException {
         final int MINIMO = 99999;
         final int MAXIMO = 10000;
-        if (ordenNueva.getEstado() == 1) {
-            ordenNueva.setDetalleOrden(ordenVieja.getDetalleOrden());
-            ordenNueva.setEstado(2);
-            ordenNueva.getDetalleOrden().setDetallesCarga(null);
-            ordenNueva.getDetalleOrden().setFechaRecepcionPesajeInicial(new Date());
-            ordenNueva.setPassword((int) Math.floor(Math.random() * (MAXIMO - MINIMO + 1) + MINIMO));
-
-            if(System.getenv("MAIL_USERNAME") != null){
-                emailBusiness.sendSimpleMessage(System.getenv("MAIL_USERNAME"),"Clave generada exitosamente","Su ping generado es: '"+ordenNueva.getPassword()+"' . Por favor conservelo por seguridad");
-            }
-            return ordenDAO.save(ordenNueva);
-        } else {
+        if (ordenNueva.getEstado() != 1) {
             throw BusinessException.builder().message("La orden especificada ya pertenece a un estado superior por lo que tiene asignada una tara").build();
         }
-    }
+        ordenNueva.setDetalleOrden(ordenVieja.getDetalleOrden());
+        ordenNueva.setEstado(2);
+        ordenNueva.getDetalleOrden().setDetallesCarga(null);
+        ordenNueva.getDetalleOrden().setFechaRecepcionPesajeInicial(new Date());
+        ordenNueva.setPassword((int) Math.floor(Math.random() * (MAXIMO - MINIMO + 1) + MINIMO));
 
+        if(System.getenv("MAIL_USERNAME") != null){
+            emailBusiness.sendSimpleMessage(System.getenv("MAIL_USERNAME"),"Clave generada exitosamente","Su ping generado es: '"+ordenNueva.getPassword()+"' . Por favor conservelo por seguridad");
+        }
+        return ordenDAO.save(ordenNueva);
+    }
 
     private void addOrdenCamionController(Orden orden) throws BusinessException {
         if (orden.getCamion().getId() != null) {
@@ -287,7 +277,6 @@ public class OrdenBusiness implements IOrdenBusiness {
         try {
             Orden ordenActiva = load(orden.getNumero());
             if (!ordenActiva.getPassword().equals(orden.getPassword())) {
-
                 throw NotFoundException.builder().message("La password y el numero de orden no coinciden").build();
             }
             if (ordenActiva.getEstado() != 2 || !ordenActiva.getDetalleOrden().getDetallesCarga().isEmpty()) {
@@ -302,16 +291,7 @@ public class OrdenBusiness implements IOrdenBusiness {
                     .temperatura(0F)
                     .build()
             );
-//                ordenActiva.getDetalleOrden().getDetallesCarga().add(new DetalleCarga());
-//                ordenActiva.getDetalleOrden().getDetallesCarga().get(0).setFechaRecepcionCarga(new Date());
-//                ordenActiva.getDetalleOrden().getDetallesCarga().get(0).setMasa(0F);
-//                ordenActiva.getDetalleOrden().getDetallesCarga().get(0).setDensidad(0F);
-//                ordenActiva.getDetalleOrden().getDetallesCarga().get(0).setCaudal(0F);
-//                ordenActiva.getDetalleOrden().getDetallesCarga().get(0).setTemperatura(0F);
-                //Encender Schedule de carga
-                return update(ordenActiva);
-//                return ordenDAO.save(ordenActiva);
-
+            return update(ordenActiva);
             } catch (NotFoundException e) {
                 log.error(e.getMessage(), e);
                 throw NotFoundException.builder().ex(e).build();
@@ -328,7 +308,6 @@ public class OrdenBusiness implements IOrdenBusiness {
             if (orden.getEstado() != 2 || orden.getDetalleOrden().getDetallesCarga().isEmpty()) {
                 throw BusinessException.builder().message("La orden correspondiente no se encuentra en proceso de carga").build();
             } else {
-                //TODO: HACER QUERY NATIVA PARA SACAR EL ULTIMO DETALLE INGRESADO
                 return orden.getDetalleOrden().getDetallesCarga().get(orden.getDetalleOrden().getDetallesCarga().size() - 1);
             }
         } catch (NotFoundException e) {
@@ -432,8 +411,6 @@ public class OrdenBusiness implements IOrdenBusiness {
             log.error(e.getMessage(), e);
             throw BusinessException.builder().ex(e).build();
         }
-
         return add(orden);
-
     }
 }

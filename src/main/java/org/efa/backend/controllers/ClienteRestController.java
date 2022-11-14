@@ -46,8 +46,7 @@ public class ClienteRestController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-	
-	
+
 	@GetMapping(value="/listar", produces= MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> loadAll() {
         try {
@@ -118,8 +117,4 @@ public class ClienteRestController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-	
-	
-	
-	
 }

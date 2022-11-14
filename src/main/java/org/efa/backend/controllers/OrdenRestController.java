@@ -118,21 +118,13 @@ public class OrdenRestController {
     public ResponseEntity<?> setTara(@RequestBody Orden orden) {
         StdSerializer<Orden> serializer = new OrdenEstado2JSONSerializer(Orden.class, false);
         try {
-//            Integer password = ordenBusiness.addTara(orden);
-
             String result = JsonUtiles.getObjectMapper(Orden.class,serializer, null).writeValueAsString(ordenBusiness.addTara(orden));
-
             return new ResponseEntity<>(result, HttpStatus.OK);
-//            return new ResponseEntity<>("Password: " + password, HttpStatus.OK);
-        } catch (BusinessException e) {
+        } catch (BusinessException | JsonProcessingException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
-        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-            return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -219,7 +211,7 @@ public class OrdenRestController {
         try {
             Orden response = ordenBusiness.addExternal(httpEntity.getBody());
             HttpHeaders responseHeaders = new HttpHeaders();
-            //responseHeaders.set("location", Constants.URL_INTEGRATION_CLI1 + "/products/" + response.getCodCli1());
+            responseHeaders.set("location", Paths.URL_ORDENES + "/codigo/" + response.getCodigoExterno());
             return new ResponseEntity<>(responseHeaders, HttpStatus.CREATED);
         } catch (BusinessException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
@@ -228,5 +220,4 @@ public class OrdenRestController {
             return new ResponseEntity<>(response.build(HttpStatus.FOUND, e, e.getMessage()), HttpStatus.FOUND);
         }
     }
-
 }

@@ -117,6 +117,4 @@ public class ProductoRestController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }
-
