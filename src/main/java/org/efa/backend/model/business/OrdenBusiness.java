@@ -7,6 +7,7 @@ import org.efa.backend.exceptions.custom.BusinessException;
 import org.efa.backend.exceptions.custom.FoundException;
 import org.efa.backend.exceptions.custom.NotFoundException;
 import org.efa.backend.model.DetalleCarga;
+import org.efa.backend.model.DetalleOrden;
 import org.efa.backend.model.Orden;
 import org.efa.backend.model.desserializers.OrdenJSONDesserializer;
 import org.efa.backend.model.persistence.OrdenRepository;
@@ -137,56 +138,26 @@ public class OrdenBusiness implements IOrdenBusiness {
     }
 
     @Override
-    public Orden addTara(Orden orden) throws NotFoundException, BusinessException {
-        Orden ordenNueva;
-        if (orden.getDetalleOrden() == null) {
-            throw BusinessException.builder().message("Es necesario ingresar el detalle de la orden con los datos del pesaje inicial").build();
-        }
-        if (orden.getId() != null) {
-            try {
-                ordenNueva = loadById(orden.getId());
-                return upgradeOrden(orden, ordenNueva);
-            } catch (NotFoundException e) {
-                log.error(e.getMessage(), e);
-                throw NotFoundException.builder().message("No se encuentra la orden con id " + orden.getId()).build();
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                throw BusinessException.builder().ex(e).build();
-            }
-        } else {
-            if (orden.getNumero() != null) {
-                try {
-                    ordenNueva = load(orden.getNumero());
-                    return upgradeOrden(orden, ordenNueva);
-                } catch (NotFoundException e) {
-                    log.error(e.getMessage(), e);
-                    throw NotFoundException.builder().message("No se encuentra la orden con numero " + orden.getNumero()).build();
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    throw BusinessException.builder().ex(e).build();
-                }
-            } else {
-                return update(orden);
-            }
-        }
-    }
-
-    private Orden upgradeOrden(Orden ordenVieja, Orden ordenNueva) throws BusinessException {
+    public Orden addTara(Long numero, Float tara) throws NotFoundException, BusinessException {
         final int MINIMO = 99999;
         final int MAXIMO = 10000;
-        if (ordenNueva.getEstado() != 1) {
+
+        Orden orden = load(numero);
+
+        if (orden.getEstado() != 1) {
             throw BusinessException.builder().message("La orden especificada ya pertenece a un estado superior por lo que tiene asignada una tara").build();
         }
-        ordenNueva.setDetalleOrden(ordenVieja.getDetalleOrden());
-        ordenNueva.setEstado(2);
-        ordenNueva.getDetalleOrden().setDetallesCarga(null);
-        ordenNueva.getDetalleOrden().setFechaRecepcionPesajeInicial(new Date());
-        ordenNueva.setPassword((int) Math.floor(Math.random() * (MAXIMO - MINIMO + 1) + MINIMO));
 
+        orden.setDetalleOrden(new DetalleOrden());
+        orden.getDetalleOrden().setPesajeInicial(tara);
+        orden.setEstado(2);
+        orden.getDetalleOrden().setDetallesCarga(null);
+        orden.getDetalleOrden().setFechaRecepcionPesajeInicial(new Date());
+        orden.setPassword((int) Math.floor(Math.random() * (MAXIMO - MINIMO + 1) + MINIMO));
         if(System.getenv("MAIL_USERNAME") != null){
-            emailBusiness.sendSimpleMessage(System.getenv("MAIL_USERNAME"),"Clave generada exitosamente","Su ping generado es: '"+ordenNueva.getPassword()+"' . Por favor conservelo por seguridad");
+            emailBusiness.sendSimpleMessage(System.getenv("MAIL_USERNAME"),"Clave generada exitosamente","Su pin generado es: '"+orden.getPassword()+"' . Por favor conservelo por seguridad!");
         }
-        return ordenDAO.save(ordenNueva);
+        return ordenDAO.save(orden);
     }
 
     private void addOrdenCamionController(Orden orden) throws BusinessException {
@@ -270,20 +241,17 @@ public class OrdenBusiness implements IOrdenBusiness {
     }
 
     @Override
-    public Orden turnOnBomb(Orden orden) throws NotFoundException, BusinessException {
-        if (orden.getNumero() == null && orden.getPassword() == null) {
-            throw BusinessException.builder().message("Es encesario ingresar el numero de orden y la password asociada").build();
-        }
+    public Orden turnOnBomb(Long numero, Integer password) throws NotFoundException, BusinessException {
         try {
-            Orden ordenActiva = load(orden.getNumero());
-            if (!ordenActiva.getPassword().equals(orden.getPassword())) {
+            Orden orden = load(numero);
+            if (!orden.getPassword().equals(password)) {
                 throw NotFoundException.builder().message("La password y el numero de orden no coinciden").build();
             }
-            if (ordenActiva.getEstado() != 2 || !ordenActiva.getDetalleOrden().getDetallesCarga().isEmpty()) {
+            if (orden.getEstado() != 2 || !orden.getDetalleOrden().getDetallesCarga().isEmpty()) {
                 throw BusinessException.builder().message("La orden asociada ya se encuentra en proceso").build();
             }
-            ordenActiva.getDetalleOrden().setFechaInicioCarga(new Date());
-            ordenActiva.getDetalleOrden().getDetallesCarga().add(DetalleCarga.builder()
+            orden.getDetalleOrden().setFechaInicioCarga(new Date());
+            orden.getDetalleOrden().getDetallesCarga().add(DetalleCarga.builder()
                     .fechaRecepcionCarga(new Date())
                     .masa(0F)
                     .caudal(0F)
@@ -291,7 +259,7 @@ public class OrdenBusiness implements IOrdenBusiness {
                     .temperatura(0F)
                     .build()
             );
-            return update(ordenActiva);
+            return update(orden);
             } catch (NotFoundException e) {
                 log.error(e.getMessage(), e);
                 throw NotFoundException.builder().ex(e).build();
@@ -404,7 +372,7 @@ public class OrdenBusiness implements IOrdenBusiness {
     public Orden addExternal(String json) throws FoundException, BusinessException {
         ObjectMapper mapper = JsonUtiles.getObjectMapper(Orden.class,
                 new OrdenJSONDesserializer(Orden.class, camion, chofer, cliente, producto));
-        Orden orden = null;
+        Orden orden;
         try {
             orden = mapper.readValue(json, Orden.class);
         } catch (JsonProcessingException e) {

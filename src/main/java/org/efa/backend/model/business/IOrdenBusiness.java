@@ -24,9 +24,9 @@ public interface IOrdenBusiness {
 
     void deleteById(long id) throws NotFoundException, BusinessException;
 
-    Orden addTara(Orden orden) throws NotFoundException, BusinessException;
+    Orden addTara(Long numero, Float tara) throws NotFoundException, BusinessException;
 
-    Orden turnOnBomb(Orden orden) throws NotFoundException, BusinessException;
+    Orden turnOnBomb(Long numero, Integer password) throws NotFoundException, BusinessException;
 
     DetalleCarga getCargaActual(long numero) throws NotFoundException, BusinessException;
 

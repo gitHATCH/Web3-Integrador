@@ -65,7 +65,6 @@ public class ClienteBusiness implements IClienteBusiness {
             load(cliente.getRazonSocial());
             throw FoundException.builder().message("Ya existe un cliente con razon social '" + cliente.getRazonSocial() +"'").build();
         } catch (NotFoundException ex) {
-            //No existe -> procede a crear
             try {
                 return clienteDAO.save(cliente);
             } catch (Exception e) {

@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
-import javax.persistence.criteria.CriteriaBuilder;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -45,19 +43,6 @@ public final class JsonUtiles {
         for (String attr : attrs) {
             if (node.get(attr) != null) {
                 r = node.get(attr).asText();
-                break;
-            }
-        }
-        if (r == null)
-            r = defaultValue;
-        return r;
-    }
-
-    public static double getDouble(JsonNode node, String[] attrs, double defaultValue) {
-        Double r = null;
-        for (String attr : attrs) {
-            if (node.get(attr) != null && node.get(attr).isDouble()) {
-                r = node.get(attr).asDouble();
                 break;
             }
         }
@@ -105,16 +90,4 @@ public final class JsonUtiles {
         return r;
     }
 
-    public static boolean getBoolean(JsonNode node, String[] attrs, boolean defaultValue) {
-        Boolean r = null;
-        for (String attr : attrs) {
-            if (node.get(attr) != null && node.get(attr).isBoolean()) {
-                r = node.get(attr).asBoolean();
-                break;
-            }
-        }
-        if (r == null)
-            r = defaultValue;
-        return r;
-    }
 }

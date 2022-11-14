@@ -114,7 +114,7 @@ public class OrdenRestController {
         }
     }
 
-    @PutMapping(value = "/tara")
+    /*@PutMapping(value = "/tara")
     public ResponseEntity<?> setTara(@RequestBody Orden orden) {
         StdSerializer<Orden> serializer = new OrdenEstado2JSONSerializer(Orden.class, false);
         try {
@@ -126,20 +126,36 @@ public class OrdenRestController {
         } catch (NotFoundException e) {
             return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
         }
-    }
+    }*/
 
-    @PutMapping(value = "/encenderBomba")
-    public ResponseEntity<?> turnOnBomb(@RequestBody Orden orden) {
+    @PutMapping(value = "/tara")
+    public ResponseEntity<?> setTara(@RequestParam(name = "numero") Long numero,
+                                     @RequestParam(name = "tara") Float tara) {
+        StdSerializer<Orden> serializer = new OrdenEstado2JSONSerializer(Orden.class, false);
         try {
-            Orden ordenNueva = ordenBusiness.turnOnBomb(orden);
-            return new ResponseEntity<>("Bomba encendida para la orden numero "+ordenNueva.getNumero()+" y camión de patente "+ordenNueva.getCamion().getPatente(),HttpStatus.OK);
-        } catch (BusinessException e) {
+            String result = JsonUtiles.getObjectMapper(Orden.class,serializer, null).writeValueAsString(ordenBusiness.addTara(numero,tara));
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (BusinessException | JsonProcessingException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
         }
     }
+
+@PutMapping(value = "/encenderBomba")
+public ResponseEntity<?> turnOnBomb(@RequestParam(name = "numero") Long numero,
+                                    @RequestParam(name = "password") int password) {
+    try {
+        Orden ordenNueva = ordenBusiness.turnOnBomb(numero,password);
+        return new ResponseEntity<>(ordenNueva,HttpStatus.OK);
+    } catch (BusinessException e) {
+        return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
+                HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (NotFoundException e) {
+        return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+}
 
     @GetMapping(value = "/obtenerCargaActual/{numero}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> loadCargaActual(@PathVariable("numero") long numero) {
