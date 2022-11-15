@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name="ordenes")
@@ -20,31 +21,41 @@ public class Orden {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    private String codigoExterno;
+
+    @Column(nullable = false, unique = true)
     private Long numero;
 
     @Column(nullable = false)
     private Integer estado;
 
     @Column(nullable = false)
-    private Integer preset;
+    private Float preset;
 
-    @Column(length = 5, unique = true, nullable = true)
+    @Column(length = 5, nullable = true)
     private Integer password;
 
-    @ManyToOne(cascade= CascadeType.ALL)
+    @Column(nullable = false)
+    private Date fechaCargaPrevista;
+
+    @ManyToOne
     @JoinColumn(name="id_camion", nullable = false)
     private Camion camion;
 
-    @ManyToOne(cascade= CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name="id_chofer", nullable = false)
     private Chofer chofer;
 
-    @ManyToOne(cascade= CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name="id_cliente", nullable = false)
     private Cliente cliente;
 
-    @OneToOne(cascade= CascadeType.ALL)
-    @JoinColumn(name = "id_detalleOrden", nullable = false)
+    @ManyToOne
+    @JoinColumn(name="id_producto", nullable = false)
+    private Producto producto;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "id_detalleOrden", nullable = true)
     private DetalleOrden detalleOrden;
 
 }

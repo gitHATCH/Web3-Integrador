@@ -1,33 +1,35 @@
 package org.efa.backend.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name="detallesCargas")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DetalleCarga {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private Integer masa;
+    private Float masa;
 
     @Column(nullable = false)
-    private Integer densidad;
+    private Float densidad;
 
     @Column(nullable = false)
-    private Integer temperatura;
+    private Float temperatura;
 
     @Column(nullable = false)
-    private Integer caudal;
+    private Float caudal;
+
+    @Column(nullable = false)
+    private Date fechaRecepcionCarga;
 }

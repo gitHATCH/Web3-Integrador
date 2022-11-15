@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name="detallesOrdenes")
@@ -17,13 +19,10 @@ import java.util.Date;
 @AllArgsConstructor
 public class DetalleOrden {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = true)
-    private Date fechaRecepcionCarga;
-
-    @Column(nullable = true)
+    @Column(nullable = false)
     private Date fechaRecepcionPesajeInicial;
 
     @Column(nullable = true)
@@ -36,13 +35,12 @@ public class DetalleOrden {
     private Date fechaRecepcionFinal;
 
     @Column(nullable = false)
-    private Integer pesajeInicial;
+    private Float pesajeInicial;
 
-    @ManyToOne(cascade= CascadeType.ALL)
-    @JoinColumn(name="id_producto", nullable = false)
-    private Producto producto;
+    @Column(nullable = true)
+    private Float pesajeFinal;
 
-    @OneToOne(cascade= CascadeType.ALL)
-    @JoinColumn(name = "id_detalleCarga", nullable = true)
-    private DetalleCarga detalleCarga;
+    @OneToMany(cascade= CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "id_detalleOrden", nullable = true)
+    private List<DetalleCarga> detallesCarga;
 }

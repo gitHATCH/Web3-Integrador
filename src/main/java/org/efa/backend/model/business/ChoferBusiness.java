@@ -65,7 +65,6 @@ public class ChoferBusiness implements IChoferBusiness{
             load(chofer.getDni());
             throw FoundException.builder().message("Ya existe un chofer con DNI '" + chofer.getDni() +"'").build();
         } catch (NotFoundException ex) {
-            //No existe -> procede a crear
             try {
                 return choferDAO.save(chofer);
             } catch (Exception e) {

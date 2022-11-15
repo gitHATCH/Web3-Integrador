@@ -5,7 +5,6 @@ import org.efa.backend.exceptions.custom.BusinessException;
 import org.efa.backend.exceptions.custom.FoundException;
 import org.efa.backend.exceptions.custom.NotFoundException;
 import org.efa.backend.model.Camion;
-import org.efa.backend.model.Cisterna;
 import org.efa.backend.model.persistence.CamionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,17 +61,21 @@ public class CamionBusiness implements ICamionBusiness {
 
     @Override
     public Camion add(Camion camion) throws FoundException, BusinessException {
-        try {
-            load(camion.getPatente());
-            throw FoundException.builder().message("Ya existe un camion con patente '" + camion.getPatente() +"'").build();
-        } catch (NotFoundException ex) {
-            //No existe -> procede a crear
+        if(camion.getPatente().length() != 6) {
             try {
-                return camionDAO.save(camion);
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                throw BusinessException.builder().ex(e).build();
+                load(camion.getPatente());
+                throw FoundException.builder().message("Ya existe un camion con patente '" + camion.getPatente() + "'").build();
+            } catch (NotFoundException ex) {
+                try {
+                    return camionDAO.save(camion);
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw BusinessException.builder().ex(e).build();
+                }
             }
+        }
+        else{
+            throw BusinessException.builder().message("La patente ingresa no es válida").build();
         }
     }
 

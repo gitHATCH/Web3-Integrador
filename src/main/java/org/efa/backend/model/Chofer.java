@@ -16,7 +16,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class Chofer {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(length = 30, nullable = false)

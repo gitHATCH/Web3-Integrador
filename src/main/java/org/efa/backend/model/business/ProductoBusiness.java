@@ -65,7 +65,6 @@ public class ProductoBusiness implements IProductoBusiness {
             load(producto.getNombre());
             throw FoundException.builder().message("Ya existe un producto con nombre '" + producto.getNombre() +"'").build();
         } catch (NotFoundException ex) {
-            //No existe -> procede a crear
             try {
                 return productoDAO.save(producto);
             } catch (Exception e) {
