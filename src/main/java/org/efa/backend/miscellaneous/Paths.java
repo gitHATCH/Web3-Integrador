@@ -8,6 +8,5 @@ public final class Paths {
     public static final String URL_CLIENTES = URL_API + "/clientes";
     public static final String URL_ORDENES = URL_API + "/ordenes";
     public static final String URL_CHOFERES = URL_API + "/choferes";
-    public static final String URL_LOGIN = URL_API + "/login";
 
 }

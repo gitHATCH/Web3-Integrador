@@ -117,9 +117,4 @@ public class ChoferRestController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-	
-	
-	
-	
 }

@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,24 +20,8 @@ public class StandardResponse {
     @JsonIgnore
     private HttpStatus httpStatus;
 
-    public int getCode() {
-        return httpStatus.value();
-    }
-
     @JsonIgnore
     private boolean devInfoEnabled;
-
-    public String getDevInfo() {
-        if(devInfoEnabled) {
-            if(ex!=null) {
-                return ExceptionUtils.getStackTrace(ex);
-            } else {
-                return "No stack trace";
-            }
-        } else {
-            return null;
-        }
-    }
 
     public String getMessage() {
         if(message!=null)

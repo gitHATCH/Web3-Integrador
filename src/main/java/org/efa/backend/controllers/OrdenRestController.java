@@ -115,39 +115,33 @@ public class OrdenRestController {
     }
 
     @PutMapping(value = "/tara")
-    public ResponseEntity<?> setTara(@RequestBody Orden orden) {
+    public ResponseEntity<?> setTara(@RequestParam(name = "numero") Long numero,
+                                     @RequestParam(name = "tara") Float tara) {
         StdSerializer<Orden> serializer = new OrdenEstado2JSONSerializer(Orden.class, false);
         try {
-//            Integer password = ordenBusiness.addTara(orden);
-
-            String result = JsonUtiles.getObjectMapper(Orden.class,serializer, null).writeValueAsString(ordenBusiness.addTara(orden));
-
+            String result = JsonUtiles.getObjectMapper(Orden.class,serializer, null).writeValueAsString(ordenBusiness.addTara(numero,tara));
             return new ResponseEntity<>(result, HttpStatus.OK);
-//            return new ResponseEntity<>("Password: " + password, HttpStatus.OK);
-        } catch (BusinessException e) {
+        } catch (BusinessException | JsonProcessingException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
-        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-            return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PutMapping(value = "/encenderBomba")
-    public ResponseEntity<?> turnOnBomb(@RequestBody Orden orden) {
-        try {
-            Orden ordenNueva = ordenBusiness.turnOnBomb(orden);
-            return new ResponseEntity<>("Bomba encendida para la orden numero "+ordenNueva.getNumero()+" y camión de patente "+ordenNueva.getCamion().getPatente(),HttpStatus.OK);
-        } catch (BusinessException e) {
-            return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
-        }
+@PutMapping(value = "/encenderBomba")
+public ResponseEntity<?> turnOnBomb(@RequestParam(name = "numero") Long numero,
+                                    @RequestParam(name = "password") int password) {
+    try {
+        Orden ordenNueva = ordenBusiness.turnOnBomb(numero,password);
+        return new ResponseEntity<>(ordenNueva,HttpStatus.OK);
+    } catch (BusinessException e) {
+        return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
+                HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (NotFoundException e) {
+        return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
     }
+}
 
     @GetMapping(value = "/obtenerCargaActual/{numero}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> loadCargaActual(@PathVariable("numero") long numero) {
@@ -219,7 +213,7 @@ public class OrdenRestController {
         try {
             Orden response = ordenBusiness.addExternal(httpEntity.getBody());
             HttpHeaders responseHeaders = new HttpHeaders();
-            //responseHeaders.set("location", Constants.URL_INTEGRATION_CLI1 + "/products/" + response.getCodCli1());
+            responseHeaders.set("location", Paths.URL_ORDENES + "/codigo/" + response.getCodigoExterno());
             return new ResponseEntity<>(responseHeaders, HttpStatus.CREATED);
         } catch (BusinessException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
@@ -228,5 +222,4 @@ public class OrdenRestController {
             return new ResponseEntity<>(response.build(HttpStatus.FOUND, e, e.getMessage()), HttpStatus.FOUND);
         }
     }
-
 }

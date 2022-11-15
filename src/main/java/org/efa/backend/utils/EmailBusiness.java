@@ -15,7 +15,6 @@ public class EmailBusiness {
     public void sendSimpleMessage(String to, String subject, String text){
         log.trace("Enviando mail a: {}",to);
         SimpleMailMessage message = new SimpleMailMessage();
-        //message.setFrom(System.getenv("MAIL_USERNAME"));
         message.setFrom("noreply@efa.com.ar");
         message.setTo(to);
         message.setSubject(subject);

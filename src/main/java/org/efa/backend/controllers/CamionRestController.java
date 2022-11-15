@@ -108,6 +108,4 @@ public class CamionRestController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
 }
