@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CamionRepository extends JpaRepository<Camion, String> {
-    Optional<Camion> findByPatente(String patente);
+    Optional<Camion> findByCodigo(String codigo);
 
     Optional<Camion> findById(Long id);
 

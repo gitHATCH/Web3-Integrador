@@ -8,7 +8,7 @@ import org.efa.backend.model.Camion;
 import java.util.List;
 
 public interface ICamionBusiness {
-    Camion load(String patente) throws BusinessException, NotFoundException;
+    Camion load(String codigo) throws BusinessException, NotFoundException;
 
     Camion loadById(Long id) throws BusinessException, NotFoundException;
 

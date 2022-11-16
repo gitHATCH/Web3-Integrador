@@ -8,7 +8,7 @@ import org.efa.backend.model.Chofer;
 import java.util.List;
 
 public interface IChoferBusiness {
-    Chofer load(long dni) throws BusinessException, NotFoundException;
+    Chofer load(String codigo) throws BusinessException, NotFoundException;
 
     Chofer loadById(Long id) throws BusinessException, NotFoundException;
 
@@ -18,7 +18,7 @@ public interface IChoferBusiness {
 
     Chofer update(Chofer chofer) throws NotFoundException, BusinessException;
 
-    void delete(long dni) throws NotFoundException, BusinessException;
+    void delete(String codigo) throws NotFoundException, BusinessException;
 
     void deleteById(long id) throws NotFoundException, BusinessException;
 }

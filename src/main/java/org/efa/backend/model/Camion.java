@@ -20,6 +20,9 @@ public class Camion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 30, nullable = false, unique = true)
+    private String codigo;
+
     @Column(length = 7, unique = true, nullable = false)
     private String patente;
 

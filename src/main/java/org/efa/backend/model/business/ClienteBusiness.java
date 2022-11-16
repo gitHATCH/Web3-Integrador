@@ -20,16 +20,16 @@ public class ClienteBusiness implements IClienteBusiness {
     private ClienteRepository clienteDAO;
 
     @Override
-    public Cliente load(String razonSocial) throws BusinessException, NotFoundException {
+    public Cliente load(String codigo) throws BusinessException, NotFoundException {
         Optional<Cliente> response;
         try{
-            response = clienteDAO.findByRazonSocial(razonSocial);
+            response = clienteDAO.findByCodigo(codigo);
         }catch (Exception e){
             log.error(e.getMessage(), e);
             throw BusinessException.builder().ex(e).build();
         }
         if (response.isEmpty()) {
-            throw NotFoundException.builder().message("No se encuentra el cliente con razon social '" + razonSocial + "'").build();
+            throw NotFoundException.builder().message("No se encuentra el cliente con codigo '" + codigo + "'").build();
         }
         return response.get();
     }

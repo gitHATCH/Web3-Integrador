@@ -191,7 +191,7 @@ public class OrdenBusiness implements IOrdenBusiness {
         } else {
             if (orden.getChofer().getDni() != null) {
                 try {
-                    orden.setChofer(chofer.load(orden.getChofer().getDni()));
+                    orden.setChofer(chofer.load(orden.getChofer().getCodigo()));
                 } catch (NotFoundException e) {
                     log.error(e.getMessage(), e);
                     throw BusinessException.builder().message("El chofer de dni " + orden.getChofer().getDni() + " no se encuentra").build();

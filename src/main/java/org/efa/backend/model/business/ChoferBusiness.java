@@ -20,16 +20,16 @@ public class ChoferBusiness implements IChoferBusiness{
     private ChoferRepository choferDAO;
 
     @Override
-    public Chofer load(long dni) throws BusinessException, NotFoundException {
+    public Chofer load(String codigo) throws BusinessException, NotFoundException {
         Optional<Chofer> response;
         try{
-            response = choferDAO.findByDni(dni);
+            response = choferDAO.findByCodigo(codigo);
         }catch (Exception e){
             log.error(e.getMessage(), e);
             throw BusinessException.builder().ex(e).build();
         }
         if (response.isEmpty()) {
-            throw NotFoundException.builder().message("No se encuentra el chofer con dni '" + dni + "'").build();
+            throw NotFoundException.builder().message("No se encuentra el chofer con codigo '" + codigo + "'").build();
         }
         return response.get();
     }
@@ -62,8 +62,8 @@ public class ChoferBusiness implements IChoferBusiness{
     @Override
     public Chofer add(Chofer chofer) throws FoundException, BusinessException {
         try {
-            load(chofer.getDni());
-            throw FoundException.builder().message("Ya existe un chofer con DNI '" + chofer.getDni() +"'").build();
+            load(chofer.getCodigo());
+            throw FoundException.builder().message("Ya existe un chofer con codigo '" + chofer.getCodigo() +"'").build();
         } catch (NotFoundException ex) {
             try {
                 return choferDAO.save(chofer);
@@ -97,8 +97,8 @@ public class ChoferBusiness implements IChoferBusiness{
     }
 
     @Override
-    public void delete(long dni) throws NotFoundException, BusinessException {
-        Chofer chofer = load(dni);
+    public void delete(String codigo) throws NotFoundException, BusinessException {
+        Chofer chofer = load(codigo);
         try {
             choferDAO.deleteById(chofer.getId());
         } catch (Exception e) {

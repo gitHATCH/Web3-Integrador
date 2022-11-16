@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ChoferRepository extends JpaRepository<Chofer, Long>{
-    Optional<Chofer> findByDni(long dni);
+    Optional<Chofer> findByCodigo(String codigo);
 
     Optional<Chofer> findById(Long id);
 

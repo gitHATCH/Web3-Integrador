@@ -20,16 +20,16 @@ public class CamionBusiness implements ICamionBusiness {
     private CamionRepository camionDAO;
 
     @Override
-    public Camion load(String patente) throws BusinessException, NotFoundException {
+    public Camion load(String codigo) throws BusinessException, NotFoundException {
         Optional<Camion> response;
         try{
-            response = camionDAO.findByPatente(patente);
+            response = camionDAO.findByCodigo(codigo);
         }catch (Exception e){
             log.error(e.getMessage(), e);
             throw BusinessException.builder().ex(e).build();
         }
         if (response.isEmpty()) {
-            throw NotFoundException.builder().message("No se encuentra el camion con patente '" + patente + "'").build();
+            throw NotFoundException.builder().message("No se encuentra el camion con codigo '" + codigo + "'").build();
         }
         return response.get();
     }
@@ -61,10 +61,10 @@ public class CamionBusiness implements ICamionBusiness {
 
     @Override
     public Camion add(Camion camion) throws FoundException, BusinessException {
-        if(camion.getPatente().length() != 6) {
+
             try {
-                load(camion.getPatente());
-                throw FoundException.builder().message("Ya existe un camion con patente '" + camion.getPatente() + "'").build();
+                load(camion.getCodigo());
+                throw FoundException.builder().message("Ya existe un camion con codigo '" + camion.getCodigo() + "'").build();
             } catch (NotFoundException ex) {
                 try {
                     return camionDAO.save(camion);
@@ -73,10 +73,7 @@ public class CamionBusiness implements ICamionBusiness {
                     throw BusinessException.builder().ex(e).build();
                 }
             }
-        }
-        else{
-            throw BusinessException.builder().message("La patente ingresa no es válida").build();
-        }
+
     }
 
     @Override
@@ -102,8 +99,8 @@ public class CamionBusiness implements ICamionBusiness {
     }
 
     @Override
-    public void delete(String patente) throws NotFoundException, BusinessException {
-        Camion camion = load(patente);
+    public void delete(String codigo) throws NotFoundException, BusinessException {
+        Camion camion = load(codigo);
         try {
             camionDAO.deleteById(camion.getId());
         } catch (Exception e) {

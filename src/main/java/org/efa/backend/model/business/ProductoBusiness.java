@@ -20,16 +20,16 @@ public class ProductoBusiness implements IProductoBusiness {
     private ProductoRepository productoDAO;
 
     @Override
-    public Producto load(String nombre) throws BusinessException, NotFoundException {
+    public Producto load(String codigo) throws BusinessException, NotFoundException {
         Optional<Producto> response;
         try{
-            response = productoDAO.findByNombre(nombre);
+            response = productoDAO.findByCodigo(codigo);
         }catch (Exception e){
             log.error(e.getMessage(), e);
             throw BusinessException.builder().ex(e).build();
         }
         if (response.isEmpty()) {
-            throw NotFoundException.builder().message("No se encuentra el producto con nombre '" + nombre + "'").build();
+            throw NotFoundException.builder().message("No se encuentra el producto con codigo '" + codigo + "'").build();
         }
         return response.get();
     }

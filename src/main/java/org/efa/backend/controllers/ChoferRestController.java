@@ -69,10 +69,10 @@ public class ChoferRestController {
         }
     }
 	
-	@GetMapping(value = "/{dni}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> load(@PathVariable("dni") long dni) {
+	@GetMapping(value = "/{codigo}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> load(@PathVariable("codigo") String codigo) {
         try {
-            return new ResponseEntity<>(choferBusiness.load(dni), HttpStatus.OK);
+            return new ResponseEntity<>(choferBusiness.load(codigo), HttpStatus.OK);
         } catch (BusinessException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
@@ -95,10 +95,10 @@ public class ChoferRestController {
     }
 	
 	@Transactional
-	@DeleteMapping(value="/eliminar/{dni}")
-    public ResponseEntity<?> delete(@PathVariable("dni") long dni){
+	@DeleteMapping(value="/eliminar/{codigo}")
+    public ResponseEntity<?> delete(@PathVariable("codigo") String codigo){
         try {
-            choferBusiness.delete(dni);
+            choferBusiness.delete(codigo);
             return new ResponseEntity<>( HttpStatus.OK);
         } catch (BusinessException | NotFoundException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),

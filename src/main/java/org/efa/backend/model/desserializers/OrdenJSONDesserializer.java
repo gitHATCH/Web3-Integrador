@@ -51,12 +51,12 @@ public class OrdenJSONDesserializer extends StdDeserializer<Orden> {
         Long camion = Long.parseLong(JsonUtiles.getString(node,
                 "truck,autocamion,camion,idcamion,id_camion,idCamion".split(","), "0"));
 
-        String camion_patente = JsonUtiles.getString(node,
+        String codigoCamion = JsonUtiles.getString(node,
                 "patente,patentecamion,patenteCamion,camionpatente,camionPatente,patente_camion,camion_patente".split(","), null);
         Long chofer = Long.parseLong(JsonUtiles.getString(node,
                 "chofer,choffer,id_chofer,idchofer,idChofer".split(","), "0"));
-        Long dni_chofer = Long.parseLong(JsonUtiles.getString(node,
-                "dni,dniChofer,dni_chofer".split(","), "0"));
+        String codigo_chofer = JsonUtiles.getString(node,
+                "dni,dniChofer,codigo_chofer".split(","), null);
         Long cliente = Long.parseLong(JsonUtiles.getString(node,
                 "persona,cliente,consumidor".split(","), "0"));
         String razon_social = JsonUtiles.getString(node,
@@ -91,9 +91,9 @@ public class OrdenJSONDesserializer extends StdDeserializer<Orden> {
                 throw new RuntimeException(e);
             }
         }
-        if(camion_patente != null){
+        if(codigoCamion != null){
             try {
-                r.setCamion(camionBusiness.load(camion_patente));
+                r.setCamion(camionBusiness.load(codigoCamion));
             } catch (BusinessException e) {
                 throw new RuntimeException(e);
             } catch (NotFoundException e) {
@@ -111,9 +111,9 @@ public class OrdenJSONDesserializer extends StdDeserializer<Orden> {
             }
         }
 
-        if (dni_chofer != null) {
+        if (codigo_chofer != null) {
             try {
-                r.setChofer(choferBusiness.load(dni_chofer));
+                r.setChofer(choferBusiness.load(codigo_chofer));
             } catch (BusinessException e) {
                 throw new RuntimeException(e);
             } catch (NotFoundException e) {
