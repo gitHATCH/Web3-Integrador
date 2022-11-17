@@ -319,7 +319,7 @@ public class OrdenBusiness implements IOrdenBusiness {
         if (detalleCarga.getCaudal() <= 0 ||
                 detalleCarga.getMasa() == 0 ||
                 detalleCarga.getMasa() > orden.getPreset() ||
-                detalleCarga.getMasa() < orden.getDetalleOrden().getDetallesCarga().get(orden.getDetalleOrden().getDetallesCarga().size() - 1).getMasa() ||
+                detalleCarga.getMasa() < orden.getDetalleOrden().getUltimoDetalleCarga().getMasa() ||
                 detalleCarga.getDensidad() <= 0 && detalleCarga.getDensidad() >= 1) {
             throw BusinessException.builder().message("Los datos ingresados del detalle no son validos").build();
         }
