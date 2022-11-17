@@ -10,9 +10,11 @@ import org.efa.backend.model.views.IConciliacionSlimView;
 import java.util.List;
 
 public interface IOrdenBusiness {
-    Orden load(long numero) throws BusinessException, NotFoundException;
+    Orden load(String codigo) throws BusinessException, NotFoundException;
 
     Orden loadById(Long id) throws BusinessException, NotFoundException;
+
+    Orden loadByNumero(long numero) throws BusinessException, NotFoundException;
 
     List<Orden> loadAll() throws BusinessException;
 
@@ -26,13 +28,13 @@ public interface IOrdenBusiness {
 
     Orden addTara(Long numero, Float tara) throws NotFoundException, BusinessException;
 
-    Orden turnOnBomb(Long numero, Integer password) throws NotFoundException, BusinessException;
+    Orden turnOnBomb(Long numero) throws NotFoundException, BusinessException;
 
     DetalleCarga getCargaActual(long numero) throws NotFoundException, BusinessException;
 
     void cargarCamion(long numero, DetalleCarga detalleCarga) throws BusinessException, NotFoundException;
 
-    Orden turnOffBomb(Long numero, Integer password) throws NotFoundException, BusinessException;
+    Orden turnOffBomb(Long numero) throws NotFoundException, BusinessException;
 
     IConciliacionSlimView cerrarOrden(Long numero) throws BusinessException, NotFoundException;
 

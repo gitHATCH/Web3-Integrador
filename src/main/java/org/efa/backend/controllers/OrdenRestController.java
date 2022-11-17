@@ -68,7 +68,7 @@ public class OrdenRestController {
     @GetMapping(value = "/{numero}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> load(@PathVariable("numero") long numero) {
         try {
-            return new ResponseEntity<>(ordenBusiness.load(numero), HttpStatus.OK);
+            return new ResponseEntity<>(ordenBusiness.loadById(numero), HttpStatus.OK);
         } catch (BusinessException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
@@ -130,10 +130,9 @@ public class OrdenRestController {
     }
 
 @PutMapping(value = "/encenderBomba")
-public ResponseEntity<?> turnOnBomb(@RequestParam(name = "numero") Long numero,
-                                    @RequestParam(name = "password") int password) {
+public ResponseEntity<?> turnOnBomb(@RequestParam(name = "numero") Long numero) {
     try {
-        Orden ordenNueva = ordenBusiness.turnOnBomb(numero,password);
+        Orden ordenNueva = ordenBusiness.turnOnBomb(numero);
         return new ResponseEntity<>(ordenNueva,HttpStatus.OK);
     } catch (BusinessException e) {
         return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
@@ -169,11 +168,9 @@ public ResponseEntity<?> turnOnBomb(@RequestParam(name = "numero") Long numero,
     }
 
     @PutMapping(value = "/apagarBomba")
-    public ResponseEntity<?> turnOffBomb(@RequestParam(name = "numero") Long numero,
-                                         @RequestParam(name = "password") int password
-                                         ) {
+    public ResponseEntity<?> turnOffBomb(@RequestParam(name = "numero") Long numero) {
         try {
-            Orden ordenNueva = ordenBusiness.turnOffBomb(numero, password);
+            Orden ordenNueva = ordenBusiness.turnOffBomb(numero);
             return new ResponseEntity<>(ordenNueva,HttpStatus.OK);
         } catch (BusinessException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
@@ -213,7 +210,7 @@ public ResponseEntity<?> turnOnBomb(@RequestParam(name = "numero") Long numero,
         try {
             Orden response = ordenBusiness.addExternal(httpEntity.getBody());
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("location", Paths.URL_ORDENES + "/codigo/" + response.getCodigoExterno());
+            responseHeaders.set("location", Paths.URL_ORDENES + "/codigo/" + response.getCodigo());
             return new ResponseEntity<>(responseHeaders, HttpStatus.CREATED);
         } catch (BusinessException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),

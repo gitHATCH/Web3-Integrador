@@ -43,28 +43,24 @@ public class OrdenJSONDesserializer extends StdDeserializer<Orden> {
         Date fecha;
         JsonNode node = jp.getCodec().readTree(jp);
 
-        String codigoexterno = JsonUtiles.getString(node, "code_externo,cexterno_code,code,codigoExterno".split(","),null);
+        String codigo = JsonUtiles.getString(node, "code_externo,cexterno_code,code,codigoExterno".split(","),null);
 
         Long numero = Long.parseLong(JsonUtiles.getString(node,
                 "number,pedido,track_number,numero".split(","), "0"));
         Float preset = Float.parseFloat(JsonUtiles.getString(node, "limite,preset".split(","), "0"));
-        Long camion = Long.parseLong(JsonUtiles.getString(node,
-                "truck,autocamion,camion,idcamion,id_camion,idCamion".split(","), "0"));
 
         String codigoCamion = JsonUtiles.getString(node,
-                "patente,patentecamion,patenteCamion,camionpatente,camionPatente,patente_camion,camion_patente".split(","), null);
-        Long chofer = Long.parseLong(JsonUtiles.getString(node,
-                "chofer,choffer,id_chofer,idchofer,idChofer".split(","), "0"));
-        String codigo_chofer = JsonUtiles.getString(node,
-                "dni,dniChofer,codigo_chofer".split(","), null);
-        Long cliente = Long.parseLong(JsonUtiles.getString(node,
-                "persona,cliente,consumidor".split(","), "0"));
-        String razon_social = JsonUtiles.getString(node,
-                "razon_social,razonSocial,razonSocialCliente,razon_social_cliente".split(","), null);
-        Long producto = Long.parseLong(JsonUtiles.getString(node,
-                "articulo,producto,produccion".split(","), "0"));
-        String nombre = JsonUtiles.getString(node,
-                "nombre,nombreProducto,nombre_producto".split(","), null);
+                "camion,codigo_camion,codigoCamion,codigoCam".split(","), null);
+
+        String codigoChofer = JsonUtiles.getString(node,
+                "chofer,codigo_chofer,codigoChofer,codigoCho".split(","), null);
+
+        String codigoCliente = JsonUtiles.getString(node,
+                "cliente,codigo_cliente,codigoCliente,codigoCli".split(","), null);
+
+        String codigoProducto = JsonUtiles.getString(node,
+                "producto,codigo_producto,codigoProducto,codigoPro".split(","), null);
+
         String fechaPrevista = JsonUtiles.getString(node,
                 "fecha_prevista,fecha,fecha_carga_prevista".split(","), null);
 
@@ -75,90 +71,24 @@ public class OrdenJSONDesserializer extends StdDeserializer<Orden> {
             throw new RuntimeException(e);
         }
 
-
-
-        r.setNumero(numero);
-        r.setPreset(preset);
-        r.setCodigoExterno(codigoexterno);
-        r.setFechaCargaPrevista(fecha);
-
-        if (camion != 0) {
-            try {
-                r.setCamion(camionBusiness.loadById(camion));
-            } catch (BusinessException e) {
-                throw new RuntimeException(e);
-            } catch (NotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        if(codigoCamion != null){
-            try {
-                r.setCamion(camionBusiness.load(codigoCamion));
-            } catch (BusinessException e) {
-                throw new RuntimeException(e);
-            } catch (NotFoundException e) {
-                throw new RuntimeException(e);
-            }
+        if(numero != 0 && preset != 0 && codigo != null){
+            r.setNumero(numero);
+            r.setPreset(preset);
+            r.setCodigo(codigo);
+            r.setFechaCargaPrevista(fecha);
+        }else{
+            throw new RuntimeException("Datos no válidos");
         }
 
-        if (chofer != 0) {
-            try {
-                r.setChofer(choferBusiness.loadById(chofer));
-            } catch (BusinessException e) {
-                throw new RuntimeException(e);
-            } catch (NotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        if (codigo_chofer != null) {
-            try {
-                r.setChofer(choferBusiness.load(codigo_chofer));
-            } catch (BusinessException e) {
-                throw new RuntimeException(e);
-            } catch (NotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        if (cliente != 0) {
-            try {
-                r.setCliente(clienteBusiness.loadById(cliente));
-            } catch (BusinessException e) {
-                throw new RuntimeException(e);
-            } catch (NotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        if (razon_social != null) {
-            try {
-                r.setCliente(clienteBusiness.load(razon_social));
-            } catch (BusinessException e) {
-                throw new RuntimeException(e);
-            } catch (NotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        if (producto != 0) {
-            try {
-                r.setProducto(productoBusiness.loadById(producto));
-            } catch (BusinessException e) {
-                throw new RuntimeException(e);
-            } catch (NotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        if (nombre != null) {
-            try {
-                r.setProducto(productoBusiness.load(nombre));
-            } catch (BusinessException e) {
-                throw new RuntimeException(e);
-            } catch (NotFoundException e) {
-                throw new RuntimeException(e);
-            }
+        try {
+            r.setCamion(camionBusiness.load(codigoCamion));
+            r.setChofer(choferBusiness.load(codigoChofer));
+            r.setCliente(clienteBusiness.load(codigoCliente));
+            r.setProducto(productoBusiness.load(codigoProducto));
+        } catch (BusinessException e) {
+            throw new RuntimeException(e);
+        } catch (NotFoundException e){
+            throw new RuntimeException(e);
         }
 
         return r;

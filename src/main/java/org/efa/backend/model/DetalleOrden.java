@@ -43,4 +43,8 @@ public class DetalleOrden {
     @OneToMany(cascade= CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "id_detalleOrden", nullable = true)
     private List<DetalleCarga> detallesCarga;
+
+    @OneToOne
+    @JoinColumn(name = "id_ultimoDetalleCarga",nullable = true)
+    private DetalleCarga ultimoDetalleCarga;
 }

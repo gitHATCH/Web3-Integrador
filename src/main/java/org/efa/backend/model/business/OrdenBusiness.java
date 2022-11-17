@@ -42,16 +42,16 @@ public class OrdenBusiness implements IOrdenBusiness {
     private EmailBusiness emailBusiness;
 
     @Override
-    public Orden load(long numero) throws BusinessException, NotFoundException {
+    public Orden load(String codigo) throws BusinessException, NotFoundException {
         Optional<Orden> response;
         try {
-            response = ordenDAO.findByNumero(numero);
+            response = ordenDAO.findByCodigo(codigo);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw BusinessException.builder().ex(e).build();
         }
         if (response.isEmpty()) {
-            throw NotFoundException.builder().message("No se encuentra la orden numero '" + numero + "'").build();
+            throw NotFoundException.builder().message("No se encuentra la orden numero '" + codigo + "'").build();
         }
         return response.get();
     }
@@ -72,6 +72,21 @@ public class OrdenBusiness implements IOrdenBusiness {
     }
 
     @Override
+    public Orden loadByNumero(long numero) throws BusinessException, NotFoundException {
+        Optional<Orden> response;
+        try {
+            response = ordenDAO.findByNumero(numero);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw BusinessException.builder().ex(e).build();
+        }
+        if (response.isEmpty()) {
+            throw NotFoundException.builder().message("No se encuentra la orden numero '" + numero + "'").build();
+        }
+        return response.get();
+    }
+
+    @Override
     public List<Orden> loadAll() throws BusinessException {
         try {
             return ordenDAO.findAll();
@@ -84,7 +99,7 @@ public class OrdenBusiness implements IOrdenBusiness {
     @Override
     public Orden add(Orden orden) throws FoundException, BusinessException {
         try {
-            load(orden.getNumero());
+            loadByNumero(orden.getNumero());
             throw FoundException.builder().message("Ya existe la orden numero '" + orden.getNumero()).build();
         } catch (NotFoundException ex) {
             try {
@@ -128,7 +143,7 @@ public class OrdenBusiness implements IOrdenBusiness {
 
     @Override
     public void delete(long numero) throws NotFoundException, BusinessException {
-        Orden orden = load(numero);
+        Orden orden = loadByNumero(numero);
         try {
             ordenDAO.deleteById(orden.getId());
         } catch (Exception e) {
@@ -142,7 +157,7 @@ public class OrdenBusiness implements IOrdenBusiness {
         final int MINIMO = 99999;
         final int MAXIMO = 10000;
 
-        Orden orden = load(numero);
+        Orden orden = loadByNumero(numero);
 
         if (orden.getEstado() != 1) {
             throw BusinessException.builder().message("La orden especificada ya pertenece a un estado superior por lo que tiene asignada una tara").build();
@@ -169,12 +184,12 @@ public class OrdenBusiness implements IOrdenBusiness {
                 throw BusinessException.builder().message("El camion de id " + orden.getCamion().getId() + " no se encuentra").build();
             }
         } else {
-            if (orden.getCamion().getPatente() != null) {
+            if (orden.getCamion().getCodigo() != null) {
                 try {
-                    orden.setCamion(camion.load(orden.getCamion().getPatente()));
+                    orden.setCamion(camion.load(orden.getCamion().getCodigo()));
                 } catch (NotFoundException e) {
                     log.error(e.getMessage(), e);
-                    throw BusinessException.builder().message("El camion de patente " + orden.getCamion().getPatente() + " no se encuentra").build();
+                    throw BusinessException.builder().message("El camion de código " + orden.getCamion().getCodigo() + " no se encuentra").build();
                 }
             }
         }
@@ -189,12 +204,12 @@ public class OrdenBusiness implements IOrdenBusiness {
                 throw BusinessException.builder().message("El chofer de id " + orden.getChofer().getId() + " no se encuentra").build();
             }
         } else {
-            if (orden.getChofer().getDni() != null) {
+            if (orden.getChofer().getCodigo() != null) {
                 try {
                     orden.setChofer(chofer.load(orden.getChofer().getCodigo()));
                 } catch (NotFoundException e) {
                     log.error(e.getMessage(), e);
-                    throw BusinessException.builder().message("El chofer de dni " + orden.getChofer().getDni() + " no se encuentra").build();
+                    throw BusinessException.builder().message("El chofer de código " + orden.getChofer().getCodigo() + " no se encuentra").build();
                 }
             }
         }
@@ -209,12 +224,12 @@ public class OrdenBusiness implements IOrdenBusiness {
                 throw BusinessException.builder().message("El cliente de id " + orden.getCliente().getId() + " no se encuentra").build();
             }
         } else {
-            if (orden.getCliente().getRazonSocial() != null) {
+            if (orden.getCliente().getCodigo() != null) {
                 try {
-                    orden.setCliente(cliente.load(orden.getCliente().getRazonSocial()));
+                    orden.setCliente(cliente.load(orden.getCliente().getCodigo()));
                 } catch (NotFoundException e) {
                     log.error(e.getMessage(), e);
-                    throw BusinessException.builder().message("El cliente de razon social " + orden.getCliente().getRazonSocial() + " no se encuentra").build();
+                    throw BusinessException.builder().message("El cliente de código " + orden.getCliente().getCodigo() + " no se encuentra").build();
                 }
             }
         }
@@ -229,36 +244,35 @@ public class OrdenBusiness implements IOrdenBusiness {
                 throw BusinessException.builder().message("El producto de id " + orden.getProducto().getId() + " no se encuentra").build();
             }
         } else {
-            if (orden.getProducto().getNombre() != null) {
+            if (orden.getProducto().getCodigo() != null) {
                 try {
-                    orden.setProducto(producto.load(orden.getProducto().getNombre()));
+                    orden.setProducto(producto.load(orden.getProducto().getCodigo()));
                 } catch (NotFoundException e) {
                     log.error(e.getMessage(), e);
-                    throw BusinessException.builder().message("El producto de nombre " + orden.getProducto().getNombre() + " no se encuentra").build();
+                    throw BusinessException.builder().message("El producto de código " + orden.getProducto().getCodigo() + " no se encuentra").build();
                 }
             }
         }
     }
 
     @Override
-    public Orden turnOnBomb(Long numero, Integer password) throws NotFoundException, BusinessException {
+    public Orden turnOnBomb(Long numero) throws NotFoundException, BusinessException {
         try {
-            Orden orden = load(numero);
-            if (!orden.getPassword().equals(password)) {
-                throw NotFoundException.builder().message("La password y el numero de orden no coinciden").build();
-            }
+            Orden orden = loadByNumero(numero);
             if (orden.getEstado() != 2 || !orden.getDetalleOrden().getDetallesCarga().isEmpty()) {
                 throw BusinessException.builder().message("La orden asociada ya se encuentra en proceso").build();
             }
             orden.getDetalleOrden().setFechaInicioCarga(new Date());
-            orden.getDetalleOrden().getDetallesCarga().add(DetalleCarga.builder()
+            DetalleCarga ultimoDetalleCarga = DetalleCarga.builder()
                     .fechaRecepcionCarga(new Date())
                     .masa(0F)
                     .caudal(0F)
                     .densidad(0F)
                     .temperatura(0F)
-                    .build()
-            );
+                    .build();
+
+            orden.getDetalleOrden().getDetallesCarga().add(ultimoDetalleCarga);
+            orden.getDetalleOrden().setUltimoDetalleCarga(ultimoDetalleCarga);
             return update(orden);
             } catch (NotFoundException e) {
                 log.error(e.getMessage(), e);
@@ -272,11 +286,11 @@ public class OrdenBusiness implements IOrdenBusiness {
     @Override
     public DetalleCarga getCargaActual(long numero) throws BusinessException, NotFoundException {
         try {
-            Orden orden = load(numero);
+            Orden orden = loadByNumero(numero);
             if (orden.getEstado() != 2 || orden.getDetalleOrden().getDetallesCarga().isEmpty()) {
                 throw BusinessException.builder().message("La orden correspondiente no se encuentra en proceso de carga").build();
             } else {
-                return orden.getDetalleOrden().getDetallesCarga().get(orden.getDetalleOrden().getDetallesCarga().size() - 1);
+                return orden.getDetalleOrden().getUltimoDetalleCarga();
             }
         } catch (NotFoundException e) {
             log.error(e.getMessage(), e);
@@ -289,7 +303,7 @@ public class OrdenBusiness implements IOrdenBusiness {
 
     @Override
     public void cargarCamion(long numero, DetalleCarga detalleCarga) throws BusinessException, NotFoundException {
-        Orden orden = load(numero);
+        Orden orden = loadByNumero(numero);
 
         //VALIDA QUE LA BOMBA ESTE ENCENDIDA
         if (orden.getDetalleOrden().getDetallesCarga().isEmpty()) {
@@ -319,16 +333,14 @@ public class OrdenBusiness implements IOrdenBusiness {
         // AGREGA EL NUEVO DETALLE A LA ORDEN
         detalleCarga.setFechaRecepcionCarga(new Date());
         orden.getDetalleOrden().getDetallesCarga().add(detalleCarga);
+        orden.getDetalleOrden().setUltimoDetalleCarga(detalleCarga);
         update(orden);
     }
 
     @Override
-    public Orden turnOffBomb(Long numero, Integer password) throws NotFoundException, BusinessException {
-        Orden orden = load(numero);
+    public Orden turnOffBomb(Long numero) throws NotFoundException, BusinessException {
+        Orden orden = loadByNumero(numero);
 
-        if (!orden.getPassword().equals(password)) {
-            throw NotFoundException.builder().message("La password y el numero de orden no coinciden").build();
-        }
         if (orden.getDetalleOrden().getDetallesCarga().isEmpty()) {
             throw BusinessException.builder().message("Es encesario encender la bomba primero").build();
         }
@@ -343,13 +355,13 @@ public class OrdenBusiness implements IOrdenBusiness {
 
     @Override
     public IConciliacionSlimView cerrarOrden(Long numero) throws BusinessException, NotFoundException {
-        Orden orden = load(numero);
+        Orden orden = loadByNumero(numero);
         //VALIDA SI LA ORDEN ESTA EN ESTADO 3
         if(!orden.getEstado().equals(3)){
             throw BusinessException.builder().message("La orden asociada no se encuentra en el estado requerido").build();
         }
-        orden.getDetalleOrden().setPesajeFinal(orden.getDetalleOrden().getPesajeInicial() +
-                orden.getDetalleOrden().getDetallesCarga().get(orden.getDetalleOrden().getDetallesCarga().size()-1).getMasa());
+        Float pesoFinal = orden.getDetalleOrden().getUltimoDetalleCarga().getMasa() + orden.getDetalleOrden().getPesajeInicial();
+        orden.getDetalleOrden().setPesajeFinal(pesoFinal);
         orden.getDetalleOrden().setFechaRecepcionFinal(new Date());
         orden.setEstado(4);
         update(orden);
@@ -358,7 +370,7 @@ public class OrdenBusiness implements IOrdenBusiness {
 
     @Override
     public IConciliacionSlimView concilacion(Long numero) throws BusinessException, NotFoundException {
-        Orden orden = load(numero);
+        Orden orden = loadByNumero(numero);
         //VALIDA SI LA ORDEN ESTA EN ESTADO 4
         if(!orden.getEstado().equals(4)){
             throw BusinessException.builder().message("La orden asociada no se encuentra en el estado requerido").build();
