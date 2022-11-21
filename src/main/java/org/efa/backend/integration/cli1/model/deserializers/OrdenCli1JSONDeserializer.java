@@ -1,9 +1,4 @@
-package org.efa.backend.model.desserializers;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+package org.efa.backend.integration.cli1.model.deserializers;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
@@ -12,24 +7,30 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.efa.backend.exceptions.custom.BusinessException;
 import org.efa.backend.exceptions.custom.NotFoundException;
-import org.efa.backend.model.Orden;
-import org.efa.backend.model.business.*;
+import org.efa.backend.integration.cli1.model.OrdenCli1;
+import org.efa.backend.model.business.ICamionBusiness;
+import org.efa.backend.model.business.IChoferBusiness;
+import org.efa.backend.model.business.IClienteBusiness;
+import org.efa.backend.model.business.IProductoBusiness;
 import org.efa.backend.utils.JsonUtiles;
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-public class OrdenJSONDesserializer extends StdDeserializer<Orden> {
-
+public class OrdenCli1JSONDeserializer  extends StdDeserializer<OrdenCli1> {
     private static final long serialVersionUID = -3881285352118964728L;
 
-    private ICamionBusiness camionBusiness;
+    private final ICamionBusiness camionBusiness;
 
-    private IChoferBusiness choferBusiness;
+    private final IChoferBusiness choferBusiness;
 
-    private IClienteBusiness clienteBusiness;
+    private final IClienteBusiness clienteBusiness;
 
-    private IProductoBusiness productoBusiness;
+    private final IProductoBusiness productoBusiness;
 
-    public OrdenJSONDesserializer(Class<?> vc, ICamionBusiness camionBusiness, IChoferBusiness choferBusiness, IClienteBusiness clienteBusiness, IProductoBusiness productoBusiness) {
+    public OrdenCli1JSONDeserializer(Class<?> vc, ICamionBusiness camionBusiness, IChoferBusiness choferBusiness, IClienteBusiness clienteBusiness, IProductoBusiness productoBusiness) {
         super(vc);
         this.camionBusiness = camionBusiness;
         this.choferBusiness = choferBusiness;
@@ -38,16 +39,16 @@ public class OrdenJSONDesserializer extends StdDeserializer<Orden> {
     }
 
     @Override
-    public Orden deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JacksonException {
-        Orden r = new Orden();
+    public OrdenCli1 deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JacksonException {
+        OrdenCli1 r = new OrdenCli1();
         Date fecha;
         JsonNode node = jp.getCodec().readTree(jp);
 
         String codigo = JsonUtiles.getString(node, "code_externo,cexterno_code,code,codigoExterno".split(","),null);
 
-        Long numero = Long.parseLong(JsonUtiles.getString(node,
+        long numero = Long.parseLong(JsonUtiles.getString(node,
                 "number,pedido,track_number,numero".split(","), "0"));
-        Float preset = Float.parseFloat(JsonUtiles.getString(node, "limite,preset".split(","), "0"));
+        float preset = Float.parseFloat(JsonUtiles.getString(node, "limite,preset".split(","), "0"));
 
         String codigoCamion = JsonUtiles.getString(node,
                 "camion,codigo_camion,codigoCamion,codigoCam".split(","), null);
@@ -64,7 +65,7 @@ public class OrdenJSONDesserializer extends StdDeserializer<Orden> {
         String fechaPrevista = JsonUtiles.getString(node,
                 "fecha_prevista,fecha,fecha_carga_prevista".split(","), null);
 
-            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         try {
             fecha = formato.parse(fechaPrevista);
         } catch (ParseException e) {

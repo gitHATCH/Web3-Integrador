@@ -10,11 +10,10 @@ import org.efa.backend.model.views.IConciliacionSlimView;
 import java.util.List;
 
 public interface IOrdenBusiness {
-    Orden load(String codigo) throws BusinessException, NotFoundException;
 
     Orden loadById(Long id) throws BusinessException, NotFoundException;
 
-    Orden loadByNumero(long numero) throws BusinessException, NotFoundException;
+    Orden load(long numero) throws BusinessException, NotFoundException;
 
     List<Orden> loadAll() throws BusinessException;
 
@@ -40,5 +39,5 @@ public interface IOrdenBusiness {
 
     IConciliacionSlimView concilacion(Long numero) throws BusinessException, NotFoundException;
 
-    public Orden addExternal(String json) throws FoundException, BusinessException;
+//    public Orden addExternal(String json) throws FoundException, BusinessException;
 }

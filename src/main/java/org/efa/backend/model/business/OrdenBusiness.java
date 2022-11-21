@@ -1,7 +1,5 @@
 package org.efa.backend.model.business;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.efa.backend.exceptions.custom.BusinessException;
 import org.efa.backend.exceptions.custom.FoundException;
@@ -9,11 +7,9 @@ import org.efa.backend.exceptions.custom.NotFoundException;
 import org.efa.backend.model.DetalleCarga;
 import org.efa.backend.model.DetalleOrden;
 import org.efa.backend.model.Orden;
-import org.efa.backend.model.desserializers.OrdenJSONDesserializer;
 import org.efa.backend.model.persistence.OrdenRepository;
 import org.efa.backend.model.views.IConciliacionSlimView;
 import org.efa.backend.utils.EmailBusiness;
-import org.efa.backend.utils.JsonUtiles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,21 +38,6 @@ public class OrdenBusiness implements IOrdenBusiness {
     private EmailBusiness emailBusiness;
 
     @Override
-    public Orden load(String codigo) throws BusinessException, NotFoundException {
-        Optional<Orden> response;
-        try {
-            response = ordenDAO.findByCodigo(codigo);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw BusinessException.builder().ex(e).build();
-        }
-        if (response.isEmpty()) {
-            throw NotFoundException.builder().message("No se encuentra la orden numero '" + codigo + "'").build();
-        }
-        return response.get();
-    }
-
-    @Override
     public Orden loadById(Long id) throws BusinessException, NotFoundException {
         Optional<Orden> response;
         try {
@@ -72,7 +53,7 @@ public class OrdenBusiness implements IOrdenBusiness {
     }
 
     @Override
-    public Orden loadByNumero(long numero) throws BusinessException, NotFoundException {
+    public Orden load(long numero) throws BusinessException, NotFoundException {
         Optional<Orden> response;
         try {
             response = ordenDAO.findByNumero(numero);
@@ -99,7 +80,7 @@ public class OrdenBusiness implements IOrdenBusiness {
     @Override
     public Orden add(Orden orden) throws FoundException, BusinessException {
         try {
-            loadByNumero(orden.getNumero());
+            load(orden.getNumero());
             throw FoundException.builder().message("Ya existe la orden numero '" + orden.getNumero()).build();
         } catch (NotFoundException ex) {
             try {
@@ -108,7 +89,6 @@ public class OrdenBusiness implements IOrdenBusiness {
                 addOrdenChoferController(orden);
                 addOrdenClienteController(orden);
                 addOrdenProductoController(orden);
-
                 orden.setEstado(1);
                 orden.setDetalleOrden(null);
                 return ordenDAO.save(orden);
@@ -143,7 +123,7 @@ public class OrdenBusiness implements IOrdenBusiness {
 
     @Override
     public void delete(long numero) throws NotFoundException, BusinessException {
-        Orden orden = loadByNumero(numero);
+        Orden orden = load(numero);
         try {
             ordenDAO.deleteById(orden.getId());
         } catch (Exception e) {
@@ -157,7 +137,7 @@ public class OrdenBusiness implements IOrdenBusiness {
         final int MINIMO = 99999;
         final int MAXIMO = 10000;
 
-        Orden orden = loadByNumero(numero);
+        Orden orden = load(numero);
 
         if (orden.getEstado() != 1) {
             throw BusinessException.builder().message("La orden especificada ya pertenece a un estado superior por lo que tiene asignada una tara").build();
@@ -258,7 +238,7 @@ public class OrdenBusiness implements IOrdenBusiness {
     @Override
     public Orden turnOnBomb(Long numero) throws NotFoundException, BusinessException {
         try {
-            Orden orden = loadByNumero(numero);
+            Orden orden = load(numero);
             if (orden.getEstado() != 2 || !orden.getDetalleOrden().getDetallesCarga().isEmpty()) {
                 throw BusinessException.builder().message("La orden asociada ya se encuentra en proceso").build();
             }
@@ -284,9 +264,9 @@ public class OrdenBusiness implements IOrdenBusiness {
     }
 
     @Override
-    public DetalleCarga getCargaActual(long numero) throws BusinessException, NotFoundException {
+    public DetalleCarga getCargaActual(long numero) throws BusinessException, NotFoundException { ///Serializer con ultimo detalle carga, estado y detallesCarga
         try {
-            Orden orden = loadByNumero(numero);
+            Orden orden = load(numero);
             if (orden.getEstado() != 2 || orden.getDetalleOrden().getDetallesCarga().isEmpty()) {
                 throw BusinessException.builder().message("La orden correspondiente no se encuentra en proceso de carga").build();
             } else {
@@ -303,7 +283,7 @@ public class OrdenBusiness implements IOrdenBusiness {
 
     @Override
     public void cargarCamion(long numero, DetalleCarga detalleCarga) throws BusinessException, NotFoundException {
-        Orden orden = loadByNumero(numero);
+        Orden orden = load(numero);
 
         //VALIDA QUE LA BOMBA ESTE ENCENDIDA
         if (orden.getDetalleOrden().getDetallesCarga().isEmpty()) {
@@ -339,7 +319,7 @@ public class OrdenBusiness implements IOrdenBusiness {
 
     @Override
     public Orden turnOffBomb(Long numero) throws NotFoundException, BusinessException {
-        Orden orden = loadByNumero(numero);
+        Orden orden = load(numero);
 
         if (orden.getDetalleOrden().getDetallesCarga().isEmpty()) {
             throw BusinessException.builder().message("Es encesario encender la bomba primero").build();
@@ -355,7 +335,7 @@ public class OrdenBusiness implements IOrdenBusiness {
 
     @Override
     public IConciliacionSlimView cerrarOrden(Long numero) throws BusinessException, NotFoundException {
-        Orden orden = loadByNumero(numero);
+        Orden orden = load(numero);
         //VALIDA SI LA ORDEN ESTA EN ESTADO 3
         if(!orden.getEstado().equals(3)){
             throw BusinessException.builder().message("La orden asociada no se encuentra en el estado requerido").build();
@@ -369,8 +349,8 @@ public class OrdenBusiness implements IOrdenBusiness {
     }
 
     @Override
-    public IConciliacionSlimView concilacion(Long numero) throws BusinessException, NotFoundException {
-        Orden orden = loadByNumero(numero);
+    public IConciliacionSlimView concilacion(Long numero) throws BusinessException, NotFoundException {///Serializer con ultimo detalle carga y estado
+        Orden orden = load(numero);
         //VALIDA SI LA ORDEN ESTA EN ESTADO 4
         if(!orden.getEstado().equals(4)){
             throw BusinessException.builder().message("La orden asociada no se encuentra en el estado requerido").build();
@@ -380,17 +360,17 @@ public class OrdenBusiness implements IOrdenBusiness {
         return conciliacion;
     }
 
-    @Override
-    public Orden addExternal(String json) throws FoundException, BusinessException {
-        ObjectMapper mapper = JsonUtiles.getObjectMapper(Orden.class,
-                new OrdenJSONDesserializer(Orden.class, camion, chofer, cliente, producto));
-        Orden orden;
-        try {
-            orden = mapper.readValue(json, Orden.class);
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage(), e);
-            throw BusinessException.builder().ex(e).build();
-        }
-        return add(orden);
-    }
+//    @Override
+//    public Orden addExternal(String json) throws FoundException, BusinessException {
+//        ObjectMapper mapper = JsonUtiles.getObjectMapper(Orden.class,
+//                new OrdenJSONDesserializer(Orden.class, camion, chofer, cliente, producto));
+//        Orden orden;
+//        try {
+//            orden = mapper.readValue(json, Orden.class);
+//        } catch (JsonProcessingException e) {
+//            log.error(e.getMessage(), e);
+//            throw BusinessException.builder().ex(e).build();
+//        }
+//        return add(orden);
+//    }
 }

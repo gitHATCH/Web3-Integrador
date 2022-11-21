@@ -12,8 +12,6 @@ import java.util.Optional;
 public interface OrdenRepository extends JpaRepository<Orden, Long> {
     Optional<Orden> findByNumero(long numero);
 
-    Optional<Orden> findByCodigo(String codigo);
-
     Optional<Orden> findById(Long id);
 
     void deleteById(Long id);
