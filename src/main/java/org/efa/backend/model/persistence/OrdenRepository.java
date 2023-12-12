@@ -39,9 +39,9 @@ public interface OrdenRepository extends JpaRepository<Orden, Long> {
             "            from (select numero, pesaje_inicial as PesajeInicial, pesaje_final as PesajeFinal, \n" +
             "            (pesaje_final - pesaje_inicial) as NetoBalanza,\n" +
             "            avg(densidad) as PromedioDensidad, avg(temperatura) as PromedioTemperatura, avg(caudal) as PromedioCaudal\n" +
-            "            from iw3final_db.ordenes o\n" +
-            "            left join iw3final_db.detalles_ordenes dor on o.id_detalle_orden = dor.id\n" +
-            "            left join iw3final_db.detalles_cargas dcr on dor.id = dcr.id_detalle_orden\n" +
+            "            from iw3_db.ordenes o\n" +
+            "            left join iw3_db.detalles_ordenes dor on o.id_detalle_orden = dor.id\n" +
+            "            left join iw3_db.detalles_cargas dcr on dor.id = dcr.id_detalle_orden\n" +
             "            where o.numero = :numero\n" +
             "            group by 1,2,3,4) a", nativeQuery = true)
     IConciliacionSlimView getConciliacion(long numero);

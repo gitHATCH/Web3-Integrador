@@ -32,7 +32,7 @@ public class OrdenRestController {
     public ResponseEntity<?> load(@RequestBody Orden orden) {
         try {
             Orden response = ordenBusiness.add(orden);
-            HttpHeaders responseHeaders=new HttpHeaders();
+            HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set("location",Paths.URL_ORDENES+"/"+response.getId());
             return new ResponseEntity<>( responseHeaders, HttpStatus.CREATED);
         } catch (FoundException e) {

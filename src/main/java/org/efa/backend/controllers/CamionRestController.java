@@ -62,10 +62,10 @@ public class CamionRestController {
         }
     }
 
-    @GetMapping(value = "/{patente}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> load(@PathVariable("patente") String patente) {
+    @GetMapping(value = "/{codigo}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> load(@PathVariable("codigo") String codigo) {
         try {
-            return new ResponseEntity<>(camionBusiness.load(patente), HttpStatus.OK);
+            return new ResponseEntity<>(camionBusiness.load(codigo), HttpStatus.OK);
         } catch (BusinessException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
@@ -87,10 +87,10 @@ public class CamionRestController {
         }
     }
     @Transactional
-    @DeleteMapping(value="/eliminar/{patente}")
-    public ResponseEntity<?> delete(@PathVariable("patente") String patente){
+    @DeleteMapping(value="/eliminar/{codigo}")
+    public ResponseEntity<?> delete(@PathVariable("codigo") String codigo){
         try {
-            camionBusiness.delete(patente);
+            camionBusiness.delete(codigo);
             return new ResponseEntity<>( HttpStatus.OK);
         } catch (BusinessException | NotFoundException e) {
             return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),

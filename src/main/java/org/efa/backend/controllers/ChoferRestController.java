@@ -68,7 +68,8 @@ public class ChoferRestController {
             return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
         }
     }
-	
+
+
 	@GetMapping(value = "/{codigo}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> load(@PathVariable("codigo") String codigo) {
         try {

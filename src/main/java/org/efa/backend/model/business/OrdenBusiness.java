@@ -304,6 +304,7 @@ public class OrdenBusiness implements IOrdenBusiness {
     @Override
     public void cargarCamion(long numero, DetalleCarga detalleCarga) throws BusinessException, NotFoundException {
         Orden orden = loadByNumero(numero);
+        DetalleCarga ultimoDetalleCarga = orden.getDetalleOrden().getUltimoDetalleCarga();
 
         //VALIDA QUE LA BOMBA ESTE ENCENDIDA
         if (orden.getDetalleOrden().getDetallesCarga().isEmpty()) {
@@ -319,7 +320,7 @@ public class OrdenBusiness implements IOrdenBusiness {
         if (detalleCarga.getCaudal() <= 0 ||
                 detalleCarga.getMasa() == 0 ||
                 detalleCarga.getMasa() > orden.getPreset() ||
-                detalleCarga.getMasa() < orden.getDetalleOrden().getUltimoDetalleCarga().getMasa() ||
+                detalleCarga.getMasa() < ultimoDetalleCarga.getMasa() ||
                 detalleCarga.getDensidad() <= 0 && detalleCarga.getDensidad() >= 1) {
             throw BusinessException.builder().message("Los datos ingresados del detalle no son validos").build();
         }
@@ -333,7 +334,13 @@ public class OrdenBusiness implements IOrdenBusiness {
         // AGREGA EL NUEVO DETALLE A LA ORDEN
         detalleCarga.setFechaRecepcionCarga(new Date());
         orden.getDetalleOrden().getDetallesCarga().add(detalleCarga);
-        orden.getDetalleOrden().setUltimoDetalleCarga(detalleCarga);
+
+        // ACTUALIZA EL ULTIMO DETALLE
+        // si el ultimo detalle es mas viejo que el nuevo por 10 segundos o mas, entonces el nuevo es el ultimo
+        long diffInSec = (detalleCarga.getFechaRecepcionCarga().getTime() - ultimoDetalleCarga.getFechaRecepcionCarga().getTime()) / 1000;
+        if (diffInSec > 10 ) {
+            orden.getDetalleOrden().setUltimoDetalleCarga(detalleCarga);
+        }
         update(orden);
     }
 
