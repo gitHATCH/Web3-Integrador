@@ -1,30 +1,20 @@
 package org.efa.backend.auth;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import javax.persistence.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -69,6 +59,7 @@ public class User implements UserDetails {
     @Column(length = 255, nullable = false, unique = true)
     private String email;
 
+    @Hidden
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idUser;
@@ -76,6 +67,7 @@ public class User implements UserDetails {
     private String username;
     private String password;
 
+    @Hidden
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "userroles", joinColumns = {
             @JoinColumn(name = "idUser", referencedColumnName = "idUser") }, inverseJoinColumns = {
@@ -95,6 +87,7 @@ public class User implements UserDetails {
         return false;
     }
 
+    @Hidden
     @Transient
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -103,6 +96,7 @@ public class User implements UserDetails {
         return authorities;
     }
 
+    @Hidden
     @Transient
     public List<String> getAuthoritiesStr() {
         List<String> authorities = getRoles().stream().map(role -> role.getName()).collect(Collectors.toList());
@@ -110,5 +104,3 @@ public class User implements UserDetails {
     }
 
 }
-
-

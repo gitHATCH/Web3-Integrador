@@ -1,61 +1,109 @@
 package org.efa.backend.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import io.swagger.v3.oas.annotations.Hidden;
+import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.io.Serializable;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 @Entity
-@Table(name="ordenes")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "orden")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class Orden {
+@NoArgsConstructor
+@Builder
+public class Orden implements Serializable {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private long numeroOrden;
 
-    @Column(length = 30, nullable = false, unique = true)
-    private String codigo;
-
+    //TODO: ***************************************** VER esto q ond!! ************************************
     @Column(nullable = false, unique = true)
-    private Long numero;
+    private String CodigoExterno;
 
-    @Column(nullable = false)
-    private Integer estado;
-
-    @Column(nullable = false)
-    private Float preset;
-
-    @Column(length = 5, nullable = true)
-    private Integer password;
-
-    @Column(nullable = false)
-    private Date fechaCargaPrevista;
-
-    @ManyToOne
-    @JoinColumn(name="id_camion", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_camion")
     private Camion camion;
 
-    @ManyToOne
-    @JoinColumn(name="id_chofer", nullable = false)
-    private Chofer chofer;
-
-    @ManyToOne
-    @JoinColumn(name="id_cliente", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_cliente")
     private Cliente cliente;
 
-    @ManyToOne
-    @JoinColumn(name="id_producto", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_chofer")
+    private Chofer chofer;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_producto")
     private Producto producto;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "id_detalleOrden", nullable = true)
-    private DetalleOrden detalleOrden;
+    @Hidden
+    @OneToMany(mappedBy = "orden", fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<Detalle> detalle;
 
+    //VER FECHAS!!!!
+    @Column(name = "preset")
+    private Float preset;
+
+    @Column(name = "fecha_turno_carga")
+    private OffsetDateTime fechaTurnoCarga;
+
+    @Hidden
+    @Column(name = "fecha_pesaje_inicial")
+    private OffsetDateTime fechaPesajeInicial;
+
+    @Hidden
+    @Column(name = "estado")
+    private int estado;
+
+    @Hidden
+    @Column(name = "tara")
+    private long tara;
+
+    @Hidden
+    @Column(name = "password")
+    private long password;
+
+    @Hidden
+    @Column(name = "alarma")
+    private boolean alarma; //indica si la alarma de la temperatura para una orden fue aceptada o no.
+    @Hidden
+    @Column(name = "temperatura_umbral")
+    private float temperaturaUmbral;
+
+    //Ultimos valores medidos del detalle de carga
+    @Hidden
+    @Column(name = "ultima_masa")
+    private float ultimaMasa;
+    @Hidden
+    @Column(name = "ultima_densidad")
+    private float ultimaDensidad;
+    @Hidden
+    @Column(name = "ultima_temperatura")
+    private float ultimaTemperatura;
+    @Hidden
+    @Column(name = "ultimo_caudal")
+    private float ultimoCaudal;
+
+    @Hidden
+    @Column(name = "pesaje_final")
+    private long pesajeFinal;
+
+    @Hidden
+    @Column(name = "fecha_pesaje_final")
+    private OffsetDateTime fechaPesajeFinal;
+
+    @Hidden
+    @Column(name = "fecha_detalle_final")
+    private OffsetDateTime fechaDetalleFinal;
+
+    @Hidden
+    @Column(name = "fecha_detalle_inicial")
+    private OffsetDateTime fechaDetalleInicial;
 }

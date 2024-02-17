@@ -1,34 +1,34 @@
 package org.efa.backend.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
-@Table(name="choferes")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "chofer")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class Chofer {
+@NoArgsConstructor
+@Builder
+public class Chofer implements Serializable {
+
+
+    private static final long serialVersionUID = -2600344777206015479L;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long dni;
 
-    @Column(length = 30, nullable = false, unique = true)
-    private String codigo;
-
-    @Column(length = 30, nullable = false)
+    @Column(name = "nombre")
     private String nombre;
 
-    @Column(length = 40, nullable = false)
+    @Column(name = "apellido")
     private String apellido;
 
-    @Column(length = 7, nullable = false, unique = true)
-    private Long dni;
-
+    @Column(length = 50, nullable = false, unique = true)
+    private String code; //codigo externo
 }

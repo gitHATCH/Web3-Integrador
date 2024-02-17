@@ -1,11 +1,11 @@
 package org.efa.backend.auth;
 
+import org.efa.backend.model.business.exceptions.BusinessException;
+import org.efa.backend.model.business.exceptions.NotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
-import org.efa.backend.exceptions.custom.BusinessException;
-import org.efa.backend.exceptions.custom.NotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 public interface IUserBusiness {
 
     public List<User> list() throws BusinessException;
@@ -18,4 +18,6 @@ public interface IUserBusiness {
     public void disable(String usernameOrEmail) throws NotFoundException, BusinessException;
 
     public void enable(String usernameOrEmail) throws NotFoundException, BusinessException;
+
+    User add(User user) throws NotFoundException, BusinessException;
 }

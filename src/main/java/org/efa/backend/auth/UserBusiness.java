@@ -1,16 +1,18 @@
 package org.efa.backend.auth;
+
+import lombok.extern.slf4j.Slf4j;
+import org.efa.backend.model.business.exceptions.BusinessException;
+import org.efa.backend.model.business.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
-import org.efa.backend.exceptions.custom.BusinessException;
-import org.efa.backend.exceptions.custom.NotFoundException;
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class UserBusiness implements IUserBusiness{
+public class UserBusiness implements IUserBusiness {
 
     @Autowired
     private UserRepository userDAO;
@@ -31,8 +33,6 @@ public class UserBusiness implements IUserBusiness{
         return ou.get();
     }
 
-    // primer metodo carga una cuenta por el username o email
-
     @Override
     public void changePassword(String usernameOrEmail, String oldPassword, String newPassword, PasswordEncoder pEncoder)
             throws BadPasswordException, NotFoundException, BusinessException {
@@ -49,9 +49,11 @@ public class UserBusiness implements IUserBusiness{
         }
     }
 
-    // intentamos cargar el user, y luego usamos el password encoder para ver si coincide la password vieja con la provista
-    //el metodo encode del codificador del password que genera el hash
-    // aqui se podria complicar la generacion del password con las reglas que nosotros quisieramos
+    public static void getPassword(PasswordEncoder pEncoder) {
+        User user = new User();
+        user.setPassword(pEncoder.encode("admin"));
+        System.out.println(user.getPassword());
+    }
 
     @Override
     public void disable(String usernameOrEmail) throws NotFoundException, BusinessException {
@@ -84,4 +86,12 @@ public class UserBusiness implements IUserBusiness{
         }
     }
 
+    @Override
+    public User add(User user) throws NotFoundException, BusinessException {
+        try{
+            return userDAO.save(user);
+        } catch (Exception e){
+            throw BusinessException.builder().message("Error crecion de usuario").build();
+        }
+    }
 }

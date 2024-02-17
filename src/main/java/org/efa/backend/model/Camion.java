@@ -1,36 +1,38 @@
 package org.efa.backend.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
-@Table(name="camiones")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "camion")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class Camion {
+@NoArgsConstructor
+@Builder
+public class Camion implements Serializable {
+
+    private static final long serialVersionUID = -2162240618874701205L;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(length = 30, nullable = false, unique = true)
-    private String codigo;
-
-    @Column(length = 7, unique = true, nullable = false)
+    @Column(length = 10, unique = true)
     private String patente;
 
-    @Column(length = 200)
+    @Column
     private String descripcion;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name="id_camion", nullable = true)
-    private List<Cisterna> cisternas;
+
+    @OneToMany(mappedBy = "camion", fetch = FetchType.EAGER)
+    List<Cisternado> datosCisterna;
+
+    @Column
+    private long totalCisterna;
+
+    @Column(length = 50, nullable = false, unique = true)
+    private String code; //codigo externo
 
 }
