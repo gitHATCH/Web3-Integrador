@@ -60,7 +60,7 @@ public class OrdenDeserealizer extends StdDeserializer<Orden> {
         r.setNumeroOrden(Long.parseLong(numeroOrden));
         r.setCamion(Camion.builder().patente(patente).descripcion(descripcion).datosCisterna(cisternadoList).totalCisterna(Long.parseLong(totalCisterna)).build());
         r.setChofer(Chofer.builder().dni(Long.parseLong(dni)).nombre(nombre).apellido(apellido).build());
-        r.setCliente(Cliente.builder().razonSocial(Long.parseLong(razonSocial)).contacto(Long.parseLong(contacto)).build());
+        r.setCliente(Cliente.builder().razonSocial(razonSocial).contacto(Long.parseLong(contacto)).build());
         r.setProducto(Producto.builder().id(Long.parseLong(id)).nombre(nombreProducto).descripcion(descripcionProducto).build());
         r.setPreset(Float.parseFloat(preset));
         r.setFechaTurnoCarga(OffsetDateTime.parse(fechaTurnoCarga));

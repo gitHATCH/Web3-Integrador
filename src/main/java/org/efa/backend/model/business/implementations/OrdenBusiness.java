@@ -212,29 +212,10 @@ public class OrdenBusiness implements IOrdenBusiness {
         } catch (JsonProcessingException e) {
             throw BusinessException.builder().ex(e).build();
         }
-        System.out.println("=============================");
-        System.out.println(orden.getCamion());
-        System.out.println("=============================");
         Optional<Orden> r = ordenRepository.findByNumeroOrden(orden.getNumeroOrden());
         if (r.isPresent()){
             throw FoundException.builder().message("Ya hay una orden con el nro " + orden.getNumeroOrden()).build();
         }
-//        Camion camion;
-//        try {
-//            if (!camionBusiness.exists(orden.getCamion().getCode())) {
-//                // cuando el camion es nuevo
-//                camionBusiness.add(orden.getCamion());
-//                for (Cisternado cisternado : orden.getCamion().getDatosCisterna()) {
-//                    cisternado.setCamion(orden.getCamion());
-//                    cisternadoBusiness.add(cisternado);
-//                }
-//            } else {
-//                // camion q ya existe
-////                camion = camionBusiness.add(orden.getCamion());
-////                orden.setCamion(camion);
-//                throw FoundException.builder().message("Ya existe un camion con el CODIGO: " + orden.getCamion().getCode()).build();
-//            }
-//        }
         try {
             camionBusiness.load(orden.getCamion().getCode());
         }
@@ -248,7 +229,7 @@ public class OrdenBusiness implements IOrdenBusiness {
             throw e;
         }
         catch (Exception e) {
-            throw BusinessException.builder().message("Error al crear el chofer, en orden.").build();
+            throw BusinessException.builder().message("Error al agregar el chofer, en orden.").build();
         }
         try {
             clienteBusiness.load(orden.getCliente().getCode());
@@ -257,7 +238,7 @@ public class OrdenBusiness implements IOrdenBusiness {
             throw e;
         }
         catch (Exception e) {
-            throw BusinessException.builder().message("Error al crear el cliente, en orden.").build();
+            throw BusinessException.builder().message("Error al agregar el cliente, en orden.").build();
         }
         try {
             productoBusiness.load(orden.getProducto().getCode());
@@ -266,7 +247,7 @@ public class OrdenBusiness implements IOrdenBusiness {
             throw e;
         }
         catch (Exception e) {
-            throw BusinessException.builder().message("Error al crear el producto, en orden.").build();
+            throw BusinessException.builder().message("Error al agregar el producto, en orden.").build();
         }
         try {
             orden.setEstado(1);

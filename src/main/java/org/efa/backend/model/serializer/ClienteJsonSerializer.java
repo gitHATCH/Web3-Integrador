@@ -18,7 +18,7 @@ public class ClienteJsonSerializer extends StdSerializer<Cliente> {
     @Override
     public void serialize(Cliente cliente, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
-        jsonGenerator.writeNumberField("razonSocial", cliente.getRazonSocial());
+        jsonGenerator.writeStringField("razonSocial", cliente.getRazonSocial());
         jsonGenerator.writeNumberField("contacto", cliente.getContacto());
         jsonGenerator.writeStringField("code", cliente.getCode());
         jsonGenerator.writeEndObject();
