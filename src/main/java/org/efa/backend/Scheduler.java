@@ -39,29 +39,38 @@ public class Scheduler {
 
     @Value("${temperatura.umbral}")
     private float temperaturaUmbral;
-
+    // detalle.async : 30 se establece una variable string con un valor de 30 que el timeUnit establece en segundos
+    // por ende se ejecutara cada 30 segundos con un delay de 1 segundo
     @Async
-    @Scheduled(fixedDelayString = "${detalle.async:120}", initialDelay = 30, timeUnit = TimeUnit.SECONDS)
+    @Scheduled(fixedDelayString = "${detalle.async:30}", initialDelay = 1, timeUnit = TimeUnit.SECONDS)
     public void detalles() throws BusinessException, NotFoundException {
         log.info("Guardando los detalles...");
 
         // accedemos al Map que tiene <orden , detalle recientes>
         Map<Long, DetalleReciente> ordenes = detalleBusiness.getOrdenes();
-
         for (Map.Entry<Long, DetalleReciente> entry : ordenes.entrySet()) {
             Long ordenId = entry.getKey();
             DetalleReciente detalle = entry.getValue();
 
             detalleBusiness.add(detalle.getDetalleReciente(), ordenId);
-
             Orden orden = ordenBusiness.load(ordenId);
-            if (!orden.isAlarma()){ // alarma no fue aceptada aun
+
+            // Verificamos si la alarma no se encuentra activada 'false'
+
+            if (!orden.isAlarma()){
+
+                // Verificamos si el ultimo detalle de la temperatura supera al umbral establecido
+
                 if (detalle.getDetalleReciente().getTemperatura() > orden.getTemperaturaUmbral()) {
+                    //mandamos mail estableciendo cual fue la temperatura
                     mailBusiness.sendSimpleMessageToAll(detalle.getDetalleReciente().getTemperatura());
+                    // Activa la alarma
+                    orden.setAlarma(true);
+                    ordenRepository.save(orden);
                 }
-                orden.setAlarma(true);
-                ordenRepository.save(orden);
+
             }
+
         }
 
         detalleBusiness.borrarMapaOrdenes();

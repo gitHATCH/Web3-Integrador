@@ -10,6 +10,7 @@ import org.efa.backend.model.persistence.MailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,6 +41,7 @@ public class MailBusiness implements IMailBusiness {
         }
     }
 
+    // Se envia un mail a todas las direcciones que figuran guardadas de dicha entidad
     public void sendSimpleMessageToAll(Float temperatura) {
 
         List<Mail> list = mailRepository.findAll();
@@ -47,6 +49,17 @@ public class MailBusiness implements IMailBusiness {
         for (Mail mail : list) {
             sendSimpleMessage(mail.getMail(), "Temperatura!", "Temperatura umbral superada: " + temperatura);
         }
+    }
+
+    @Async
+    public void sendPasswordToAll(long password) {
+
+        List<Mail> list = mailRepository.findAll();
+
+        for (Mail mail : list) {
+            sendSimpleMessage(mail.getMail(), "Password!", "La contraseña es: " + password);
+        }
+
     }
 
     @Override

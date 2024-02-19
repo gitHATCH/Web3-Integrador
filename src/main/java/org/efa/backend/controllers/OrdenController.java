@@ -71,6 +71,25 @@ public class OrdenController extends BaseRestController {
     }
 
     @SneakyThrows
+    @Operation(operationId = "findOrder", summary = "Este servicio devuelve una orden.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Orden retornada correctamente."),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = StandartResponse.class))}),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+    })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping(value = "/find/{numeroOrden}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> findOrder(
+            @PathVariable long numeroOrden
+    ) {
+        try {
+            return new ResponseEntity<>(ordenBusiness.load(numeroOrden), HttpStatus.OK);
+        } catch (BusinessException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+    @SneakyThrows
     @Operation(operationId = "inicio", summary = "(1) Este servicio crea una Orden. Deja la orden en ESTADO 1.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Orden creada correctamente.", content = {

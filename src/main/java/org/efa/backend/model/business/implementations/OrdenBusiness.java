@@ -46,6 +46,8 @@ public class OrdenBusiness implements IOrdenBusiness {
     private ClienteBusiness clienteBusiness;
     @Autowired
     private ProductoBusiness productoBusiness;
+    @Autowired
+    private MailBusiness mailBusiness;
 
     @Value("${temperatura.umbral}")
     private float temperaturaUmbral;
@@ -93,7 +95,7 @@ public class OrdenBusiness implements IOrdenBusiness {
         }
     }
 
-
+    // obtengo la orden por el numero de orden
     @Override
     public Orden load(long numeroOrden) throws BusinessException, NotFoundException {
         Optional<Orden> r;
@@ -109,6 +111,14 @@ public class OrdenBusiness implements IOrdenBusiness {
         return r.get();
     }
 
+    /**
+     * Este método se utiliza para obtener todas las instancias de 'Orden' de la base de datos.
+     * Utiliza el método 'findAll' del 'ordenRepository' para recuperar todas las instancias de 'Orden'.
+     * Si ocurre alguna excepción durante el proceso, registra el mensaje de error y lanza una BusinessException con un mensaje personalizado.
+     *
+     * @return Lista de todas las instancias de 'Orden' de la base de datos.
+     * @throws BusinessException si ocurre alguna excepción durante el proceso.
+     */
     @Override
     public List<Orden> list() throws BusinessException {
         try {
@@ -212,6 +222,7 @@ public class OrdenBusiness implements IOrdenBusiness {
         orden.setTara(ordenNew.getTara());
         orden.setFechaPesajeInicial(OffsetDateTime.now());
         orden.setPassword(PasswordGenerator.generateFiveDigitPassword());
+        mailBusiness.sendPasswordToAll(orden.getPassword());
         orden.setEstado(2);
         return ordenRepository.save(orden);
     }
