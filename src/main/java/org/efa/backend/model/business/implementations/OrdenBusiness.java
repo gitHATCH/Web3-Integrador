@@ -137,7 +137,7 @@ public class OrdenBusiness implements IOrdenBusiness {
         if (r.isPresent()){
             throw FoundException.builder().message("Ya hay una orden con el nro " + orden.getNumeroOrden()).build();
         }
-        Camion camion;
+//        Camion camion;
         try {
             if (!camionBusiness.exists(orden.getCamion().getCode())) {
                 // cuando el camion es nuevo
@@ -212,8 +212,75 @@ public class OrdenBusiness implements IOrdenBusiness {
         } catch (JsonProcessingException e) {
             throw BusinessException.builder().ex(e).build();
         }
+        System.out.println("=============================");
+        System.out.println(orden.getCamion());
+        System.out.println("=============================");
+        Optional<Orden> r = ordenRepository.findByNumeroOrden(orden.getNumeroOrden());
+        if (r.isPresent()){
+            throw FoundException.builder().message("Ya hay una orden con el nro " + orden.getNumeroOrden()).build();
+        }
+//        Camion camion;
+//        try {
+//            if (!camionBusiness.exists(orden.getCamion().getCode())) {
+//                // cuando el camion es nuevo
+//                camionBusiness.add(orden.getCamion());
+//                for (Cisternado cisternado : orden.getCamion().getDatosCisterna()) {
+//                    cisternado.setCamion(orden.getCamion());
+//                    cisternadoBusiness.add(cisternado);
+//                }
+//            } else {
+//                // camion q ya existe
+////                camion = camionBusiness.add(orden.getCamion());
+////                orden.setCamion(camion);
+//                throw FoundException.builder().message("Ya existe un camion con el CODIGO: " + orden.getCamion().getCode()).build();
+//            }
+//        }
+        try {
+            camionBusiness.load(orden.getCamion().getCode());
+        }
+        catch (Exception e) {
+            throw e;
+        }
+        try {
+            choferBusiness.load(orden.getChofer().getCode());
+        }
+        catch (NotFoundException e) {
+            throw e;
+        }
+        catch (Exception e) {
+            throw BusinessException.builder().message("Error al crear el chofer, en orden.").build();
+        }
+        try {
+            clienteBusiness.load(orden.getCliente().getCode());
+        }
+        catch (NotFoundException e) {
+            throw e;
+        }
+        catch (Exception e) {
+            throw BusinessException.builder().message("Error al crear el cliente, en orden.").build();
+        }
+        try {
+            productoBusiness.load(orden.getProducto().getCode());
+        }
+        catch (NotFoundException e) {
+            throw e;
+        }
+        catch (Exception e) {
+            throw BusinessException.builder().message("Error al crear el producto, en orden.").build();
+        }
+        try {
+            orden.setEstado(1);
+            if (orden.getCodigoExterno() == null) {
+                orden.setCodigoExterno(System.currentTimeMillis() + "");
+            }
+            if (orden.getTemperaturaUmbral() == 0) {
+                orden.setTemperaturaUmbral(temperaturaUmbral);
+            }
 
-        return this.add(orden);
+            return ordenRepository.save(orden);
+        } catch (Exception e) {
+            throw BusinessException.builder().message("Error en creacion de la orden.").build();
+        }
     }
 
     @Override

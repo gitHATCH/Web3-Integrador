@@ -124,6 +124,7 @@ public class OrdenController extends BaseRestController {
     public ResponseEntity<?> addExternal(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Entidades:  numeroOrden, camion, chofer, cliente, producto, preset, fechaTurnoCarga.")
                                          @RequestBody String json) {
         StdSerializer<Orden> ser = new OrdenJsonSerializer(Orden.class, false);
+        System.out.println("json = " + json);
         try {
             String result = JsonUtiles.getObjectMapper(Orden.class, ser, null).writeValueAsString(ordenBusiness.addExternal(json));
             return new ResponseEntity<>(result, HttpStatus.CREATED);

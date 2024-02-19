@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import org.efa.backend.model.Camion;
 import org.efa.backend.model.Orden;
 import org.efa.backend.model.business.exceptions.BusinessException;
 import org.efa.backend.model.business.exceptions.FoundException;
@@ -54,8 +55,11 @@ public class OrdenExternaDeserealizer extends StdDeserializer<Orden> {
         r.setNumeroOrden(Long.parseLong(numeroOrden));
         if (camion != null) {
             try {
-                r.setCamion(camionBusiness.load(camion)); //busca por codigo de camion
+                Camion camion1 = camionBusiness.load(camion);
+                r.setCamion(camion1); //busca por codigo de camion
             } catch (FoundException | BusinessException | NotFoundException e) {
+                System.out.println("Error: " + e);
+                throw new IOException(e);
             }
         }
         if (chofer != null) {

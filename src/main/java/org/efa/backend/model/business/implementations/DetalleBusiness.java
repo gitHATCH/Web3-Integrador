@@ -11,6 +11,7 @@ import org.efa.backend.model.business.exceptions.NotFoundException;
 import org.efa.backend.model.business.interfaces.IDetalleBusiness;
 import org.efa.backend.model.persistence.DetalleRepository;
 import org.efa.backend.model.persistence.OrdenRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -26,6 +27,8 @@ public class DetalleBusiness implements IDetalleBusiness {
 
     private final DetalleRepository detalleRepository;
     private final OrdenRepository ordenRepository;
+//    @Autowired
+//    private OrdenBusiness ordenBusiness;
 
     private Map<Long, DetalleReciente> ordenes = new HashMap<>();
 
@@ -117,6 +120,10 @@ public class DetalleBusiness implements IDetalleBusiness {
         }
         if (detalle.getMasa() > orden.get().getPreset()) {
             throw BusinessException.builder().message("Error, valor de masa superior al Preset.").build();
+        }
+        if (detalle.getMasa() >= orden.get().getPreset()) {
+            orden.get().setEstado(3);
+            ordenRepository.save(orden.get());
         }
 
         DetalleReciente detalleReciente = ordenes.get(numeroOrden);
