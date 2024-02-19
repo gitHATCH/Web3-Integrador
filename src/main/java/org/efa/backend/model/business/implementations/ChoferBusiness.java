@@ -49,11 +49,9 @@ public class ChoferBusiness implements IChoferBusiness {
 
     @Override
     public Chofer add(Chofer chofer) throws FoundException, BusinessException, NotFoundException {
-        try {
-            if (choferRepository.existsByCode(chofer.getCode())) {
-                return load(chofer.getCode());
-            }
-        } catch (NotFoundException e) {
+        if (choferRepository.existsByCode(chofer.getCode())) {
+//                return load(chofer.getCode());
+            throw FoundException.builder().message("Ya existe un chofer con el CODIGO: " + chofer.getCode()).build();
         }
         try {
             return choferRepository.save(chofer);

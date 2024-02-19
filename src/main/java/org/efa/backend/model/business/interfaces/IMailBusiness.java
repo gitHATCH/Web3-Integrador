@@ -10,6 +10,7 @@ import java.util.List;
 public interface IMailBusiness {
 
     Mail load(long id) throws NotFoundException, BusinessException;
+    Mail load(String mail) throws NotFoundException, BusinessException;
 
     List<Mail> list() throws BusinessException;
 

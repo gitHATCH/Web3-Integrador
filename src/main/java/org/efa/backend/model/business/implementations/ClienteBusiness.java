@@ -48,11 +48,9 @@ public class ClienteBusiness implements IClienteBusiness {
 
     @Override
     public Cliente add(Cliente cliente) throws FoundException, BusinessException, NotFoundException {
-        try {
-            if (clienteRepository.existsByCode(cliente.getCode())) {
-                return load(cliente.getCode());
-            }
-        } catch (NotFoundException e) {
+        if (clienteRepository.existsByCode(cliente.getCode())) {
+//                return load(cliente.getCode());
+            throw FoundException.builder().message("Ya existe un cliente con el CODIGO: " + cliente.getCode()).build();
         }
         try {
             return clienteRepository.save(cliente);

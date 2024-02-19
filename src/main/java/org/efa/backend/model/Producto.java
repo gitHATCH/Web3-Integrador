@@ -2,10 +2,7 @@ package org.efa.backend.model;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -20,6 +17,8 @@ public class Producto implements Serializable {
     private static final long serialVersionUID = -2510094698283791123L;
 
     @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(name = "nombre")

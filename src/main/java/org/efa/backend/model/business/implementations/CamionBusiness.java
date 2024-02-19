@@ -24,6 +24,14 @@ public class CamionBusiness implements ICamionBusiness {
 
     private final CisternadoBusiness cisternadoBusiness;
 
+    /**
+     * Este método se utiliza para obtener un objeto Camion basado en el código proporcionado.
+     *
+     * @param code Este es el identificador único para el objeto Camion.
+     * @return Camion Este devuelve el objeto Camion asociado con el código proporcionado.
+     * @throws NotFoundException Esta excepción se lanza cuando no se encuentra un objeto Camion con el código proporcionado.
+     * @throws BusinessException Esta excepción se lanza cuando hay un error en la lógica de negocio o en el acceso a la base de datos.
+     */
     @Override
     public Camion load(String code) throws NotFoundException, BusinessException {
         Optional<Camion> camion;
@@ -54,11 +62,9 @@ public class CamionBusiness implements ICamionBusiness {
 
     @Override
     public Camion add(Camion camion) throws FoundException, BusinessException, NotFoundException {
-        try {
-            if (camionRepository.existsByCode(camion.getCode())) {
-                return load(camion.getCode());
-            }
-        } catch (NotFoundException e) {
+        if (camionRepository.existsByCode(camion.getCode())) {
+//                return load(camion.getCode());
+            throw FoundException.builder().message("Ya existe un camion con el CODIGO: " + camion.getCode()).build();
         }
         try {
             Camion result = camionRepository.save(camion);

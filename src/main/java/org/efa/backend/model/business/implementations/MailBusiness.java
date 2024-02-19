@@ -78,6 +78,22 @@ public class MailBusiness implements IMailBusiness {
     }
 
     @Override
+    public Mail load(String mail) throws NotFoundException, BusinessException {
+        Optional<Mail> r;
+        try {
+            r = mailRepository.findByMail(mail);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw BusinessException.builder().ex(e).build();
+        }
+        if (r.isEmpty()) {
+            throw NotFoundException.builder().message("No se encuentra el mail con mail=" + mail).build();
+        }
+        return r.get();
+    }
+
+
+    @Override
     public List<Mail> list() throws BusinessException {
         try {
             return mailRepository.findAll();
@@ -90,8 +106,8 @@ public class MailBusiness implements IMailBusiness {
     @Override
     public Mail add(Mail mail) throws FoundException, BusinessException {
         try {
-            load(mail.getId());
-            throw FoundException.builder().message("Se encontró el mail con id=" + mail.getId()).build();
+            load(mail.getMail());
+            throw FoundException.builder().message("Se encontró el mail con mail=" + mail.getMail()).build();
         } catch (NotFoundException e) {
         }
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.efa.backend.model.Camion;
 import org.efa.backend.model.Cisternado;
@@ -147,26 +148,44 @@ public class OrdenBusiness implements IOrdenBusiness {
                 }
             } else {
                 // camion q ya existe
-                camion = camionBusiness.add(orden.getCamion());
-                orden.setCamion(camion);
+//                camion = camionBusiness.add(orden.getCamion());
+//                orden.setCamion(camion);
+                throw FoundException.builder().message("Ya existe un camion con el CODIGO: " + orden.getCamion().getCode()).build();
             }
-        } catch (Exception e) {
+        }
+        catch (FoundException e) {
+            throw e;
+        }
+        catch (Exception e) {
             throw BusinessException.builder().message("Error al crear el camion, en orden.").build();
         }
         try {
             choferBusiness.add(orden.getChofer());
-        } catch (Exception e) {
+        }
+        catch (FoundException e) {
+            throw e;
+        }
+        catch (Exception e) {
             throw BusinessException.builder().message("Error al crear el chofer, en orden.").build();
         }
         try {
             clienteBusiness.add(orden.getCliente());
-        } catch (Exception e) {
+        }
+        catch (FoundException e) {
+            throw e;
+        }
+        catch (Exception e) {
             throw BusinessException.builder().message("Error al crear el cliente, en orden.").build();
         }
         try {
             productoBusiness.add(orden.getProducto());
-        } catch (Exception e) {
-            throw BusinessException.builder().message("Error al crear el producto, en orden.").build();
+        }
+        catch (FoundException e) {
+            throw e;
+        }
+        catch (Exception e) {
+            throw e;
+//            throw BusinessException.builder().message("Error al crear el producto, en orden.").build();
         }
         try {
             orden.setEstado(1);
