@@ -30,4 +30,8 @@ public class Alarma {
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable=false)
     private User usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "id_orden", nullable=false)
+    private Orden orden;
 }
