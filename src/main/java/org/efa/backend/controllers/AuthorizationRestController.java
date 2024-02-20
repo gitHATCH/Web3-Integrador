@@ -54,13 +54,12 @@ public class AuthorizationRestController extends BaseRestController {
     }
 
     @Hidden
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/user-or-admin")
     public ResponseEntity<String> rolUserOArdmin() {
         return new ResponseEntity<String>("Servicio user or admin", HttpStatus.OK);
     }
 
-    //TODO: ************************** este endpoint deberia estar!! ***************************************
     @Operation(operationId = "my-rols", summary = "Este servicio retorna los roles que posee el usuario.")
     @Parameter(in = ParameterIn.QUERY, name = "username", schema = @Schema(type = "string"), required = true, description = "Nombre del usuario.")
     @ApiResponses(value = {

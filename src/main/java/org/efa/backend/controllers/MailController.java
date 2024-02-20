@@ -51,7 +51,7 @@ public class MailController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = StandartResponse.class))}),
             @ApiResponse(responseCode = "403", description = "Forbidden"),
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping()
     public ResponseEntity<?> list() {
         try {
@@ -86,6 +86,7 @@ public class MailController {
 
     @Hidden
     @DeleteMapping(value = "/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> delete(@PathVariable("id") long id){
         try {
             mailBusiness.delete(id);

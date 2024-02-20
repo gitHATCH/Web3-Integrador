@@ -57,7 +57,7 @@ public class OrdenController extends BaseRestController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = StandartResponse.class))}),
             @ApiResponse(responseCode = "403", description = "Forbidden"),
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping(value = "/find-all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findAll() {
         try {
@@ -75,7 +75,7 @@ public class OrdenController extends BaseRestController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = StandartResponse.class))}),
             @ApiResponse(responseCode = "403", description = "Forbidden"),
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping(value = "/find/{numeroOrden}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findOrder(
             @PathVariable long numeroOrden
@@ -225,7 +225,7 @@ public class OrdenController extends BaseRestController {
             @ApiResponse(responseCode = "404", description = "Not found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = StandartResponse.class))})
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping(value = "/conciliacion", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> checkOut(@RequestHeader(name = "NumeroOrden") long numeroOrden) {
         try {

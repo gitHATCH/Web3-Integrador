@@ -76,7 +76,7 @@ public class ClienteController extends BaseRestController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = StandartResponse.class))}),
             @ApiResponse(responseCode = "403", description = "Forbidden"),
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping(value = "/buscar/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> get(@PathVariable("code") String code) {
         try {
@@ -96,7 +96,7 @@ public class ClienteController extends BaseRestController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = StandartResponse.class))}),
             @ApiResponse(responseCode = "403", description = "Forbidden"),
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping(value = "/find-all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findAll() {
         try {
