@@ -31,7 +31,7 @@ public class ConciliacionSerializer extends StdSerializer<Orden> {
         gen.writeNumberField("pesaje_final", orden.getPesajeFinal());
         List<Detalle> detalles;
         try {
-            detalles = detalleBusiness.listByNumeroOrden(orden.getNumeroOrden());
+            detalles = detalleBusiness.listByIdOrden(orden.getId());
         } catch (BusinessException e) {
             throw new RuntimeException(e);
         }

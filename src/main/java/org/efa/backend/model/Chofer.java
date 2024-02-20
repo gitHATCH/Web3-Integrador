@@ -1,11 +1,9 @@
 package org.efa.backend.model;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -21,6 +19,11 @@ public class Chofer implements Serializable {
     private static final long serialVersionUID = -2600344777206015479L;
 
     @Id
+    @Hidden
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(name = "dni", nullable = false, unique = true)
     private long dni;
 
     @Column(name = "nombre")

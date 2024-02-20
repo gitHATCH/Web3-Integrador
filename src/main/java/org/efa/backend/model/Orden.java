@@ -20,9 +20,14 @@ import java.util.List;
 public class Orden implements Serializable {
 
     @Id
+    @Hidden
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(name = "numero_orden", nullable = false, unique = true)
     private long numeroOrden;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "codigo_externo",nullable = false, unique = true)
     private String CodigoExterno;
 
     @ManyToOne(fetch = FetchType.EAGER)

@@ -61,9 +61,10 @@ public class DetalleBusiness implements IDetalleBusiness {
     }
 
     @Override
-    public List<Detalle> listByNumeroOrden(long numeroOrden) throws BusinessException {
+    public List<Detalle> listByIdOrden(long id) throws BusinessException {
         try {
-            return detalleRepository.findAllById_NumeroOrden(numeroOrden);
+
+            return detalleRepository.findAllById_idorden(id);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw BusinessException.builder().ex(e).build();

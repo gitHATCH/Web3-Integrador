@@ -9,9 +9,9 @@ import java.util.List;
 @Repository
 public interface DetalleRepository extends JpaRepository<Detalle, Long> {
 
-    @Query(value = "select * from detalle where numero_orden = ?", nativeQuery = true)
-    List<Detalle> findAllById_NumeroOrden(long numeroOrden);
+    @Query(value = "select * from detalle where id_orden = ?", nativeQuery = true)
+    List<Detalle> findAllById_idorden(long idOrden);
 
-    Boolean existsDetalleByOrden_numeroOrden(long numeroOrden);
+    Boolean existsDetalleByOrden_numeroOrden(long idOrden);
 }
 

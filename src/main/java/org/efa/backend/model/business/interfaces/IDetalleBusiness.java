@@ -18,7 +18,7 @@ public interface IDetalleBusiness {
 
     void add(Detalle detalle, long numeroOrden) throws BusinessException;
 
-    List<Detalle> listByNumeroOrden(long numeroOrden) throws BusinessException;
+    List<Detalle> listByIdOrden(long id) throws BusinessException;
 
     void procesarDetalle(Detalle detalle, long numeroOrden, int password) throws NotFoundException, BusinessException, NotAuthorizedException;
 

@@ -21,7 +21,7 @@ public class Cliente implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "razon_social")
+    @Column(name = "razon_social", nullable = false, unique = true)
     private String razonSocial;
 
     @Column(name = "contacto")

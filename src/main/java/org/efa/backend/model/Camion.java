@@ -1,6 +1,7 @@
 package org.efa.backend.model;
 
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;
 
 import javax.persistence.*;
@@ -19,7 +20,11 @@ public class Camion implements Serializable {
     private static final long serialVersionUID = -2162240618874701205L;
 
     @Id
-    @Column(length = 10, unique = true)
+    @Hidden
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(length = 10, nullable = false, unique = true)
     private String patente;
 
     @Column

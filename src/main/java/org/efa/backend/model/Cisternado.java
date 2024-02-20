@@ -24,10 +24,11 @@ public class Cisternado implements Serializable {
     @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id_cisterna;
+    private long id;
 
     @ManyToOne
-    @JoinColumn(name = "patente")
+    @JoinColumn(name = "id_camion")
+//    @JoinColumn(name = "patente")
     @JsonIgnore
     private Camion camion;
 

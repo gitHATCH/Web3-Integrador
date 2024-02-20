@@ -27,7 +27,7 @@ public class Detalle implements Serializable {
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = "numero_orden")
+    @JoinColumn(name = "id_orden")
     @JsonIgnore
     private Orden orden;
 
