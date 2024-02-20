@@ -22,7 +22,6 @@ public class Orden implements Serializable {
     @Id
     private long numeroOrden;
 
-    //TODO: ***************************************** VER esto q ond!! ************************************
     @Column(nullable = false, unique = true)
     private String CodigoExterno;
 

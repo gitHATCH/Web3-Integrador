@@ -61,6 +61,26 @@ public class CamionController extends BaseRestController {
     }
 
     @SneakyThrows
+    @Operation(operationId = "camion-delete", summary = "Este servicio elimina un camion a partir de su codigo externo.")
+    @Parameter(in = ParameterIn.PATH, name = "code", schema = @Schema(type = "string"), required = true, description = "Codigo externo.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Se elimino el camion."),
+            @ApiResponse(responseCode = "404", description = "No se encuentra el camion para el identificador informado", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = StandartResponse.class))}),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+    })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @DeleteMapping(value = "/eliminar/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> delete(@PathVariable("code") String code) {
+        try {
+            camionBusiness.delete(code);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @SneakyThrows
     @Operation(operationId = "camion-post", summary = "Este servicio crea un camion.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Camion creado correctamente."),

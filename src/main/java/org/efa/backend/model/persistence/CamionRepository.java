@@ -11,4 +11,7 @@ public interface CamionRepository extends JpaRepository<Camion, String> {
 
     Optional<Camion> findByCode(String code);
     Boolean existsByCode(String code);
+
+//    void deleteByCode(String code);
+    void deleteCamionByCode(String code);
 }

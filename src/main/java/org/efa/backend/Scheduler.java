@@ -39,10 +39,10 @@ public class Scheduler {
 
     @Value("${temperatura.umbral}")
     private float temperaturaUmbral;
-    // detalle.async : 30 se establece una variable string con un valor de 30 que el timeUnit establece en segundos
-    // por ende se ejecutara cada 30 segundos con un delay de 1 segundo
+    // detalle.async : 5 se establece una variable string con un valor de 5 que el timeUnit establece en segundos
+    // por ende se ejecutara cada 5 segundos con un delay de 1 segundo
     @Async
-    @Scheduled(fixedDelayString = "${detalle.async:30}", initialDelay = 1, timeUnit = TimeUnit.SECONDS)
+    @Scheduled(fixedDelayString = "${detalle.async:15}", initialDelay = 1, timeUnit = TimeUnit.SECONDS)
     public void detalles() throws BusinessException, NotFoundException {
         log.info("Guardando los detalles...");
 

@@ -77,4 +77,16 @@ public class CamionBusiness implements ICamionBusiness {
             throw BusinessException.builder().message("Error creacion de camion").build();
         }
     }
+
+    @Override
+    public void delete(String code) throws NotFoundException, BusinessException, FoundException {
+        if (!camionRepository.existsByCode(code)) {
+            throw NotFoundException.builder().message("No se encuentra el camion con CODIGO: " + code).build();
+        }
+        try {
+            camionRepository.deleteCamionByCode(code);
+        } catch (Exception e) {
+            throw BusinessException.builder().message("Error al eliminar el camion con CODIGO: " + code).build();
+        }
+    }
 }

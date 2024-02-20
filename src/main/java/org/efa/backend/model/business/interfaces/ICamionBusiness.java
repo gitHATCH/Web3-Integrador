@@ -17,4 +17,8 @@ public interface ICamionBusiness {
 
     Camion add(Camion camion) throws FoundException, BusinessException, NotFoundException;
 
+//    Camion update(Camion camion) throws FoundException, BusinessException, NotFoundException;
+
+    void delete(String code) throws NotFoundException, BusinessException, FoundException;
+
 }
