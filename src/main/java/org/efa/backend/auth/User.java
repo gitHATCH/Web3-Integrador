@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.efa.backend.model.Alarma;
+import org.efa.backend.model.Cisternado;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -66,6 +68,9 @@ public class User implements UserDetails {
     @Column(length = 100, unique = true)
     private String username;
     private String password;
+
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER)
+    List<Alarma> datosAlarma;
 
     @Hidden
     @ManyToMany(fetch = FetchType.EAGER)
