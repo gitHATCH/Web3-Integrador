@@ -18,7 +18,7 @@ public class ProductoJsonSerializer extends StdSerializer<Producto> {
     @Override
     public void serialize(Producto producto, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
-        jsonGenerator.writeNumberField("id", producto.getId());
+//        jsonGenerator.writeNumberField("id", producto.getId());
         jsonGenerator.writeStringField("nombre", producto.getNombre());
         jsonGenerator.writeStringField("descripcion", producto.getDescripcion());
         jsonGenerator.writeStringField("code", producto.getCode());

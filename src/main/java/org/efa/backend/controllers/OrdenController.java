@@ -20,10 +20,7 @@ import org.efa.backend.model.business.exceptions.NotAuthorizedException;
 import org.efa.backend.model.business.exceptions.NotFoundException;
 import org.efa.backend.model.business.interfaces.IDetalleBusiness;
 import org.efa.backend.model.business.interfaces.IOrdenBusiness;
-import org.efa.backend.model.serializer.DetalleJsonSerializer;
-import org.efa.backend.model.serializer.OrdenCierreJsonSerializer;
-import org.efa.backend.model.serializer.OrdenJsonSerializer;
-import org.efa.backend.model.serializer.OrdenPassJsonSerializer;
+import org.efa.backend.model.serializer.*;
 import org.efa.backend.utils.JsonUtiles;
 import org.efa.backend.utils.StandartResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,11 +80,11 @@ public class OrdenController extends BaseRestController {
     public ResponseEntity<?> findOrder(
             @PathVariable long numeroOrden
     ) {
-        StdSerializer<Orden> ser = new OrdenJsonSerializer(Orden.class, false);
+        StdSerializer<Orden> ser = new OrdenExtendedSerializer(Orden.class, false);
         try {
-//            String result = JsonUtiles.getObjectMapper(Orden.class, ser, null).writeValueAsString(ordenBusiness.load(numeroOrden));
-            return new ResponseEntity<>(ordenBusiness.load(numeroOrden), HttpStatus.OK);
-//            return new ResponseEntity<>(result, HttpStatus.OK);
+            String result = JsonUtiles.getObjectMapper(Orden.class, ser, null).writeValueAsString(ordenBusiness.load(numeroOrden));
+//            return new ResponseEntity<>(ordenBusiness.load(numeroOrden), HttpStatus.OK);
+            return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (BusinessException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
