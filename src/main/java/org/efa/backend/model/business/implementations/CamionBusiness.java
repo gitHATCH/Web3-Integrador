@@ -66,12 +66,19 @@ public class CamionBusiness implements ICamionBusiness {
 //                return load(camion.getCode());
             throw FoundException.builder().message("Ya existe un camion con el CODIGO: " + camion.getCode()).build();
         }
+        if (camionRepository.existsByPatente(camion.getPatente())) {
+            throw FoundException.builder().message("Ya existe un camion con la PATENTE: " + camion.getPatente()).build();
+        }
         try {
             Camion result = camionRepository.save(camion);
+            long totalCisterna = 0;
             for (Cisternado cisternado : camion.getDatosCisterna()){
                 cisternado.setCamion(result);
                 cisternadoBusiness.add(cisternado);
+                totalCisterna += cisternado.getTamanio();
             }
+            result.setTotalCisterna(totalCisterna);
+            camionRepository.save(result);
             return result;
         } catch (Exception e) {
             throw BusinessException.builder().message("Error creacion de camion").build();

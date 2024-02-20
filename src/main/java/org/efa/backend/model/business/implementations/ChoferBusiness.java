@@ -53,6 +53,9 @@ public class ChoferBusiness implements IChoferBusiness {
 //                return load(chofer.getCode());
             throw FoundException.builder().message("Ya existe un chofer con el CODIGO: " + chofer.getCode()).build();
         }
+        if (choferRepository.existsByDni(chofer.getDni())) {
+            throw FoundException.builder().message("Ya existe un chofer con el DNI: " + chofer.getDni()).build();
+        }
         try {
             return choferRepository.save(chofer);
         } catch (Exception e) {

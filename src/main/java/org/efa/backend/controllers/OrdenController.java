@@ -83,8 +83,11 @@ public class OrdenController extends BaseRestController {
     public ResponseEntity<?> findOrder(
             @PathVariable long numeroOrden
     ) {
+        StdSerializer<Orden> ser = new OrdenJsonSerializer(Orden.class, false);
         try {
+//            String result = JsonUtiles.getObjectMapper(Orden.class, ser, null).writeValueAsString(ordenBusiness.load(numeroOrden));
             return new ResponseEntity<>(ordenBusiness.load(numeroOrden), HttpStatus.OK);
+//            return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (BusinessException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }

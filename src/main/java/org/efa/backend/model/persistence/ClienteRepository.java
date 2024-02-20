@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface ClienteRepository extends JpaRepository<Cliente, String> {
     Optional<Cliente> findByCode(String code);
     Boolean existsByCode(String code);
+
+    Boolean existsByRazonSocial(String razonSocial);
 }

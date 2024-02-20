@@ -52,6 +52,9 @@ public class ClienteBusiness implements IClienteBusiness {
 //                return load(cliente.getCode());
             throw FoundException.builder().message("Ya existe un cliente con el CODIGO: " + cliente.getCode()).build();
         }
+        if (clienteRepository.existsByRazonSocial(cliente.getRazonSocial())) {
+            throw FoundException.builder().message("Ya existe un cliente con la RAZON SOCIAL: " + cliente.getRazonSocial()).build();
+        }
         try {
             return clienteRepository.save(cliente);
         } catch (Exception e) {

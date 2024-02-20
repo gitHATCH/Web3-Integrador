@@ -12,4 +12,6 @@ public interface ChoferRepository extends JpaRepository<Chofer, String> {
     Optional<Chofer> findByCode(String code);
     Boolean existsByCode(String code);
 
+    Boolean existsByDni(long dni);
+
 }
