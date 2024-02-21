@@ -61,13 +61,12 @@ public class AuthorizationRestController extends BaseRestController {
     }
 
     @Operation(operationId = "my-rols", summary = "Este servicio retorna los roles que posee el usuario.")
-    @Parameter(in = ParameterIn.QUERY, name = "username", schema = @Schema(type = "string"), required = true, description = "Nombre del usuario.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Retorna un arreglo con los roles."),
             @ApiResponse(responseCode = "403", description = "Forbidden")})
-    @PreAuthorize("#username == authentication.principal.username")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/my-rols")
-    public ResponseEntity<String> myRols(@RequestParam("username") String username) {
+    public ResponseEntity<String> myRols() {
         return new ResponseEntity<String>(getUserLogged().getAuthorities().toString(), HttpStatus.OK);
     }
 
