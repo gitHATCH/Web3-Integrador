@@ -19,6 +19,7 @@ import org.efa.backend.model.business.exceptions.FoundException;
 import org.efa.backend.model.business.exceptions.NotAuthorizedException;
 import org.efa.backend.model.business.exceptions.NotFoundException;
 import org.efa.backend.model.business.interfaces.IDetalleBusiness;
+import org.efa.backend.model.business.interfaces.IAlarmaBusiness;
 import org.efa.backend.model.business.interfaces.IOrdenBusiness;
 import org.efa.backend.model.serializer.*;
 import org.efa.backend.utils.JsonUtiles;
@@ -28,6 +29,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -41,6 +44,8 @@ public class OrdenController extends BaseRestController {
     private IOrdenBusiness ordenBusiness;
     @Autowired
     private IDetalleBusiness detalleBusiness;
+    @Autowired
+    private IAlarmaBusiness alarmaBusiness;
 
     @SneakyThrows
     @Hidden //TODO: *********** esto se usa?? **************************
@@ -246,8 +251,13 @@ public class OrdenController extends BaseRestController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(value = "/aceptar-alarma", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> aceptarAlarma(@RequestHeader(name = "NumeroOrden") long numeroOrden) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String nombreUsuario = authentication.getName();
         try {
             ordenBusiness.aceptarAlarma(numeroOrden);
+            alarmaBusiness.add(numeroOrden,nombreUsuario);
+
             return new ResponseEntity<>("Alarma aceptada para orden con numero: " + numeroOrden, HttpStatus.OK);
         } catch (BusinessException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
