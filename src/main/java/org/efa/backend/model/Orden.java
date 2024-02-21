@@ -55,9 +55,9 @@ public class Orden implements Serializable {
     @Column(name = "preset")
     private Float preset;
 
-    @OneToMany(mappedBy = "orden", fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
-    private List<Alarma> datosAlarma;
+//    @OneToMany(mappedBy = "orden", fetch = FetchType.EAGER)
+//    @Fetch(value = FetchMode.SUBSELECT)
+//    private List<Alarma> datosAlarma;
 
     @Column(name = "fecha_turno_carga")
     private OffsetDateTime fechaTurnoCarga;

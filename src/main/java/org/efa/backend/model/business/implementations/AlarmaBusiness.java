@@ -30,11 +30,11 @@ public class AlarmaBusiness implements IAlarmaBusiness {
     @Override
     public Alarma add(long numeroOrden, String nombreUsuario) throws FoundException, BusinessException, NotFoundException {
 
-        Orden orden = ordenBusiness.load(numeroOrden);
+//        Orden orden = ordenBusiness.load(numeroOrden);
 
         Alarma alarma = Alarma.builder()
                 .fecha(OffsetDateTime.now())
-                .orden(orden)
+                .numeroOrden(numeroOrden)
                 .usuario(userBusiness.load(nombreUsuario))
                 .build();
 

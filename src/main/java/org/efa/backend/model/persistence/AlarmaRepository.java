@@ -10,6 +10,4 @@ import java.util.List;
 @Repository
 public interface AlarmaRepository extends JpaRepository<Alarma, String> {
 
-
-    List<Alarma> findAllByOrden_NumeroOrden(long numeroOrden);
 }
