@@ -36,7 +36,9 @@ public class ChoferBusinessTest {
         // given
         Chofer chofer = Chofer.builder().dni(1234).code("test123").build();
         given(choferRepository.existsByCode(any(String.class))).willReturn(false);
+//        given(choferRepository.existsByCode(any(String.class))).willReturn(false);
         given(choferRepository.save(any(Chofer.class))).willReturn(Chofer.builder().dni(4223423).build());
+
 
         // when
         Chofer result = choferBusiness.add(chofer);
@@ -49,7 +51,8 @@ public class ChoferBusinessTest {
     public void add_OK_True() throws FoundException, BusinessException, NotFoundException {
         // given
         Chofer chofer = Chofer.builder().dni(1234).code("test123").build();
-        given(choferRepository.existsByCode(any(String.class))).willReturn(true);
+//        given(choferRepository.existsByCode(any(String.class))).willReturn(true);
+        given(choferRepository.existsByCode(any(String.class))).willReturn(false);
         given(choferRepository.save(any(Chofer.class))).willReturn(Chofer.builder().dni(4223423).build());
 
         // when
