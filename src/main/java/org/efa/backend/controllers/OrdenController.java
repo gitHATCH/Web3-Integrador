@@ -241,30 +241,6 @@ public class OrdenController extends BaseRestController {
     }
 
     @SneakyThrows
-    @Operation(operationId = "aceptar-alarma", summary = "Este servicio acepta la alarma de envio de mails.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Alarma aceptada corectamente para una orden."),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Not found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = StandartResponse.class))})
-    })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping(value = "/aceptar-alarma", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> aceptarAlarma(@RequestHeader(name = "NumeroOrden") long numeroOrden) {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String nombreUsuario = authentication.getName();
-        try {
-            ordenBusiness.aceptarAlarma(numeroOrden);
-            alarmaBusiness.add(numeroOrden,nombreUsuario);
-
-            return new ResponseEntity<>("Alarma aceptada para orden con numero: " + numeroOrden, HttpStatus.OK);
-        } catch (BusinessException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @SneakyThrows
     @Operation(operationId = "temperatura-umbral", summary = "Este servicio establece la temperatura umbral.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Temperatura umbral establecida corectamente para una orden."),
